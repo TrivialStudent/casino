@@ -1,4 +1,4 @@
-from src.blackjack.card import Card
+from card import Card
 
 
 class Hand:
@@ -14,3 +14,10 @@ class Hand:
             total -= 10
             number_aces -= 1
         return total
+
+
+    def bust(self):
+        return self.value() > 21
+    def blackjack(self):
+        return self.value() == 21 and len(self.cards) == 2
+

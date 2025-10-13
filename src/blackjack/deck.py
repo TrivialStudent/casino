@@ -20,6 +20,7 @@ class Deck(object):
             self.cards, self.discarded = self.discarded, []
             self.shuffle()
         return self.cards.pop()
+
     def discard(self, card):
         self.discarded.append(card)
 

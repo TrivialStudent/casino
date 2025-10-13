@@ -6,6 +6,8 @@ class Card:
 
     def __str__(self):
         return f'{self.value} of {self.suit}'
+
+
     def get_blackjack_value(self):
         if self.value == 1:
             return 11
