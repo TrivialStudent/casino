@@ -1,14 +1,19 @@
 from hand import *
-
+import json
+from pathlib import Path
+import bcrypt
 class Player:
-    def __init__(self, name, password):
+    def __init__(self, name, password, balance=500,wins=0,losses=0, hashed=False):
         self.name = name
-        self.balance = 0
+        self.balance = balance
         self.cards = Hand()
         self.bet = 0
-        self.wins = 0
-        self.losses = 0
-        self.password = password
+        self.wins = wins
+        self.losses = losses
+        if hashed:
+            self.password = password.encode("utf-8")
+        else:
+            self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
     def place_bet(self, amount):
         if amount > self.balance:
             raise ValueError("Amount can't be greater than balance")
@@ -25,3 +30,61 @@ class Player:
         self.losses += 1
     def add_balance(self, amount):
         self.balance += amount
+    def verify_password(self, password):
+        return bcrypt.checkpw(password.encode("utf-8"), self.password)
+
+    def __str__(self):
+        return f"name: {self.name}, balance: {self.balance}, wins: {self.wins}, losses: {self.losses}, password: {self.password}"
+
+class Players:
+    list_of_players = []
+    file = Path("user_data.json")
+    @classmethod
+    def print_players(cls):
+        for player in cls.list_of_players:
+            print(player)
+    @classmethod
+    def add_player(cls, player):
+        if any(p.name == player.name for p in cls.list_of_players):
+            raise ValueError(f"A player with {player.name} already exists")
+        cls.list_of_players.append(player)
+        cls.save()
+    @classmethod
+    def save(cls):
+        json_data = [{"name": p.name, "password": p.password.decode("utf-8"), "balance": p.balance, "wins": p.wins, "losses": p.losses} for p in cls.list_of_players]
+        cls.file.write_text(json.dumps(json_data, indent=4))
+    @classmethod
+    def load(cls):
+        if cls.file.exists():
+            data = json.loads(cls.file.read_text())
+            for p in data:
+                player = Player(
+                    p["name"],
+                    p["password"],
+                    p["balance"],
+                    p["wins"],
+                    p["losses"],
+                    hashed=True
+                )
+                cls.list_of_players.append(player)
+
+    @classmethod
+    def sign_in(cls, username):
+        for player in cls.list_of_players:
+            if username.strip() == player.name.strip():
+                while True:
+                    password = input("Enter password, or enter nothing to go back: ").strip()
+                    if player.verify_password(password):
+                        print(f"Welcome back {player.name}")
+                        return player
+                    elif password == "":
+                        break
+                    else:
+                        print("Wrong password")
+        print(f"No player named {username}")
+        return None
+
+
+
+
+
