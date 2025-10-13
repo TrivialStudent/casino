@@ -1,0 +1,16 @@
+[
+    {
+        "name": "Lorcan",
+        "password": "$2b$12$z8uOxWS3U.CymE7bSrxI3uv9.V7NVeHj1f1pqMEfjl1njL67.aTyG",
+        "balance": 0,
+        "wins": 0,
+        "losses": 2
+    },
+    {
+        "name": "alan",
+        "password": "$2b$12$lQVEWe/VhSuxSFMpCGdr4OYWXx19Dceh95aBsAH3uVarFPCX3OtJy",
+        "balance": 0,
+        "wins": 0,
+        "losses": 2
+    }
+]
