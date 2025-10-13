@@ -1,7 +1,6 @@
-from card import *
+
 from dealer import *
 from deck import *
-from hand import *
 from player import *
 import time
 class Blackjack():
@@ -17,15 +16,18 @@ class Blackjack():
         self.dealer.cards = Hand()
         while True:
             try:
-                print(f"How much would you like to bet? [{self.player_account.name}'s balance is {self.player_account.balance}]")
-                self.player_account.bet = int(input("Amount: "))
-                if self.player_account.bet > self.player_account.balance:
-                    print(f"Sorry, you don't have enough money. Balance: {self.player_account.balance}")
+                print(
+                    f"How much would you like to bet? [{self.player_account.name}'s balance is {self.player_account.balance}]")
+                amount = int(input("Amount: "))
+                if amount < 1:
+                    print("Minimum bet is 1.")
                     continue
+                self.player_account.place_bet(amount)
                 break
-            except:
-                raise ValueError("Ints only")
-        self.player_account.balance -= self.player_account.bet
+            except ValueError as e:
+                print(e)
+            except Exception:
+                print("Please enter a valid integer.")
 
     def deal_cards(self):
         for _ in range(2):
