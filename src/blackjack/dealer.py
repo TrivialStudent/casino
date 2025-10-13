@@ -1,10 +1,13 @@
 from deck import *
-
-class Dealer:
+from player import *
+from hand import *
+class Dealer(Player):
     def __init__(self):
-        self.deck = Deck()
-        self.deck.fill()
-        self.deck.shuffle()
+        super().__init__(name="Dealer", password=None)
 
-    def deal(self):
-        return self.deck.draw()
+    def deal(self, deck):
+        return deck.draw()
+
+    def play(self, deck):
+        while self.cards.value() < 17:
+            self.cards.add(deck.draw())
