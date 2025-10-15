@@ -1,9 +1,13 @@
 [
     {
         "name": "lorcan",
-        "password": "$2b$12$WWfHYASSdsvopmcN9tzqTOuHFJwTkHoKQtcSwMOiOK2Ce3VvP5ypi",
-        "balance": 600,
-        "wins": 1,
-        "losses": 0
+        "password": "$2b$12$bdBw.I9VpaO6R56K5Fwv8u8ovyLdrgPDPpt15lKw4Ola4wxi/DxOy",
+        "balance": 500,
+        "wins": 0,
+        "losses": 0,
+        "balance_history": [
+            500,
+            500
+        ]
     }
 ]

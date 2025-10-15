@@ -78,7 +78,6 @@ def index():
     return redirect(url_for("login"))
 
 @app.route("/stats")
-@app.route("/stats")
 def stats():
     user = current_user()
     if not user:
