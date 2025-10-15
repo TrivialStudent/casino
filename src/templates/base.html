@@ -1,29 +1,36 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Blackjack</title>
-    <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; }
-      .box { border: 1px solid #ddd; padding: 1rem; border-radius: 8px; }
-      .row { margin: .5rem 0; }
-      .log { white-space: pre-wrap; background: #111; color: #0f0; padding: 1rem; border-radius: 6px; min-height: 200px; }
-      form { display: inline-block; margin-right: .5rem; }
-      .flash { color: #b00; margin-bottom: 1rem; }
-      input[type=number], input[type=text], input[type=password] { padding: .4rem; }
-      button { padding: .5rem .8rem; }
-      .right { float: right; }
-      a { text-decoration: none; }
-    </style>
-  </head>
-  <body>
-    {% with messages = get_flashed_messages() %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" 
+    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" 
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <title>Fake Casino</title>
+</head>
+<body>
+  <header>
+    <a href=""><h2>Fake Casino</h2></a>
+    <nav>
+      <div class="dropdown">
+        <span>Profile<i class="fa-solid fa-caret-down"></i></span>
+        <div class="dropdown-content">
+          <a href="">Profile</a>
+          <a href="">Dashboard</a>
+          <a href="{{ url_for('logout') }}">Log out</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+  {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="flash">
-          {% for m in messages %}{{ m }}<br />{% endfor %}
+          {% for m in messages %}{{ m }}<br/>{% endfor %}
         </div>
       {% endif %}
     {% endwith %}
     {% block body %}{% endblock %}
-  </body>
+</body>
 </html>

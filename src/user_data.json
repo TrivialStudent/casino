@@ -2,8 +2,8 @@
     {
         "name": "lorcan",
         "password": "$2b$12$WWfHYASSdsvopmcN9tzqTOuHFJwTkHoKQtcSwMOiOK2Ce3VvP5ypi",
-        "balance": 500,
-        "wins": 0,
+        "balance": 600,
+        "wins": 1,
         "losses": 0
     }
 ]
