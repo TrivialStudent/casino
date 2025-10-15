@@ -70,11 +70,11 @@ def render_player(user: Player):
     cards_text = ", ".join(str(c) for c in user.cards.cards)
     return f"Player cards: [{cards_text}], total value: {user.cards.value()}"
 
-
+# ------------- Routes ---------------
 @app.route("/")
 def index():
     if session.get("user"):
-        return redirect(url_for("play"))
+        return redirect(url_for("home"))
     return redirect(url_for("login"))
 
 @app.route("/stats")
@@ -129,7 +129,7 @@ def login():
         if bcrypt.checkpw(password.encode("utf-8"), player.password):
             session["user"] = player.name
             flash(f"Welcome back, {player.name}!")
-            return redirect(url_for("play"))
+            return redirect(url_for("home"))
         else:
             flash("Wrong password.")
             return redirect(url_for("login"))
@@ -141,6 +141,13 @@ def logout():
     session.pop("user", None)
     flash("Logged out.")
     return redirect(url_for("login"))
+
+@app.route("/home")
+def home():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+    return render_template("index.html")
 
 @app.route("/play", methods=["GET"])
 def play():
