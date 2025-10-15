@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user.name }}'s Stats</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #F5F5DC;
+            color: #000000;
+        }
+        .chart-container {
+            width: 60%;
+            margin: 40px auto;
+        }
+        a {
+            color: #87cefa;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ user.name }}'s Stats</h1>
+    <p><strong>Balance:</strong> ${{ user.balance }}</p>
+    <p><strong>Wins:</strong> {{ user.wins }}</p>
+    <p><strong>Losses:</strong> {{ user.losses }}</p>
+    <p><strong>Win Ratio:</strong> {{ win_ratio }}%</p>
+
+    <div class="chart-container">
+        <canvas id="statsChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="balanceChart"></canvas>
+    </div>
+
+    <script>
+        // Bar Chart (Wins/Losses)
+        const ctx1 = document.getElementById('statsChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Wins', 'Losses'],
+                datasets: [{
+                    label: 'Games Played',
+                    data: [{{ user.wins }}, {{ user.losses }}],
+                    backgroundColor: ['#000000', '#e74c3c']
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#000000' }, grid: { color: '#999' } },
+                    x: { ticks: { color: '#000000' }, grid: { color: '#999' } }
+                },
+                plugins: { legend: { labels: { color: '#000000' } } }
+            }
+        });
+
+        // Balance Scatter Chart
+        const balanceData = {{ balance_history | safe }};
+        const scatterPoints = balanceData.map((bal, i) => ({ x: i + 1, y: bal }));
+
+        const ctx2 = document.getElementById('balanceChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Account Balance per Game',
+                    data: scatterPoints,
+                    borderColor: '#000000',
+                    backgroundColor: '#87cefa',
+                    tension: 0.5,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+    scales: {
+        x: {
+            type: "linear",
+            title: { display: true, text: 'Game Number', color: '#000' },
+            ticks: {
+                stepSize: 1,                     // show every game number
+                color: '#000',
+                callback: function(value, index, ticks) {
+                    return value;                // or format differently if desired
+                }
+            },
+            grid: { color: '#999' }
+        },
+        y: {
+            title: { display: true, text: 'Balance ($)', color: '#000' },
+            ticks: {
+                color: '#000',
+                stepSize: 50                     // optional: show balance every $50
+            },
+            grid: { color: '#999' }
+        }
+    },
+    plugins: {
+        legend: { labels: { color: '#000' } }
+    }
+}
+
+        });
+    </script>
+
+    <a href="{{ url_for('play') }}">← Back to Game</a>
+</body>
+</html>

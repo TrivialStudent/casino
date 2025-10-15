@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from blackjack.deck import Deck
 from blackjack.hand import Hand
@@ -74,6 +76,22 @@ def index():
     if session.get("user"):
         return redirect(url_for("play"))
     return redirect(url_for("login"))
+
+@app.route("/stats")
+@app.route("/stats")
+def stats():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    win_ratio = round(user.win_ratio() * 100, 2)
+    return render_template(
+        "stats.html",
+        user=user,
+        win_ratio=win_ratio,
+        balance_history=json.dumps(user.balance_history)
+    )
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():

@@ -1,9 +1,24 @@
 [
     {
-        "name": "lorcan",
-        "password": "$2b$12$WWfHYASSdsvopmcN9tzqTOuHFJwTkHoKQtcSwMOiOK2Ce3VvP5ypi",
-        "balance": 500,
+        "name": "poophead",
+        "password": "$2b$12$zpEQxOcjMrTtTtBNOh4tY.rx08FwwkVe05NHlobHRnOmtA6VXGb.O",
+        "balance": 0,
         "wins": 0,
-        "losses": 0
+        "losses": 4,
+        "balance_history": [
+            500
+        ]
+    },
+    {
+        "name": "ke",
+        "password": "$2b$12$Oqx5BPZ9INV6HsGu5DO1Ou0IGwoN1PI.IrsFWYAAIgXupP.JhRakG",
+        "balance": 550,
+        "wins": 1,
+        "losses": 1,
+        "balance_history": [
+            500,
+            350,
+            550
+        ]
     }
 ]
