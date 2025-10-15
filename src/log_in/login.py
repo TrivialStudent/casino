@@ -1,4 +1,4 @@
-from src.blackjack.player import *
+from ..blackjack.player import *
 
 
 def welcome():
@@ -17,5 +17,3 @@ def welcome():
 
 def sign_in():
     print("Please enter username: ")
-
-

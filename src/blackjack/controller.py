@@ -1,7 +1,6 @@
-
-from dealer import *
-from deck import *
-from player import *
+from .dealer import *
+from .deck import *
+from .player import *
 import time
 class Blackjack():
     def __init__(self, player: Player):

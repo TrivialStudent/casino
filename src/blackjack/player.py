@@ -1,4 +1,4 @@
-from hand import *
+from .hand import Hand
 import json
 from pathlib import Path
 import bcrypt
@@ -10,7 +10,9 @@ class Player:
         self.bet = 0
         self.wins = wins
         self.losses = losses
-        if hashed:
+        if password is None:
+            self.password = None
+        elif hashed:
             self.password = password.encode("utf-8")
         else:
             self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())

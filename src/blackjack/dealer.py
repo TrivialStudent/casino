@@ -1,6 +1,6 @@
-from deck import *
-from player import *
-from hand import *
+
+from .player import *
+
 class Dealer(Player):
     def __init__(self):
         super().__init__(name="Dealer", password=None)

@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Blackjack</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      .box { border: 1px solid #ddd; padding: 1rem; border-radius: 8px; }
+      .row { margin: .5rem 0; }
+      .log { white-space: pre-wrap; background: #111; color: #0f0; padding: 1rem; border-radius: 6px; min-height: 200px; }
+      form { display: inline-block; margin-right: .5rem; }
+      .flash { color: #b00; margin-bottom: 1rem; }
+      input[type=number], input[type=text], input[type=password] { padding: .4rem; }
+      button { padding: .5rem .8rem; }
+      .right { float: right; }
+      a { text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">
+          {% for m in messages %}{{ m }}<br />{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block body %}{% endblock %}
+  </body>
+</html>
