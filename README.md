@@ -1,7 +1,8 @@
 # casino
 A casino implementation with Blackjack 
 
-Welcome to Casino!
+#Welcome to Casino!
+
 Features
 -User account system (sing in, log in, log out)
 -Balance tracking and betting system
