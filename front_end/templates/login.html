@@ -2,19 +2,21 @@
 {% block body %}
 <h2>Log in</h2>
 <div class="box">
-  <form method="post">
-    <div class="row">
-      <label>Username</label><br />
-      <input name="username" type="text" required />
-    </div>
-    <div class="row">
-      <label>Password</label><br />
-      <input name="password" type="password" required />
-    </div>
-    <div class="row">
-      <button type="submit">Log in</button>
-      <a href="{{ url_for('signup') }}">or Sign up</a>
-    </div>
+
+    <form method="post">
+      <div class="row">
+        <label>Username</label><br />
+        <input name="username" type="text" required />
+      </div>
+      <div class="row">
+        <label>Password</label><br />
+        <input name="password" type="password" required />
+      </div>
+      <div class="row" style="text-align:center;">
+          <button type="submit">Log in</button><br />
+          <span class="small-text">or </span><br />
+          <a href="{{ url_for('signup') }}">Sign up</a>
+      </div > 
   </form>
 </div>
 {% endblock %}
