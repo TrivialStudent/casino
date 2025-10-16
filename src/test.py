@@ -146,7 +146,7 @@ def home():
     user = current_user()
     if not user:
         return redirect(url_for("login"))
-    return render_template("index.html")
+    return render_template("index.html", user=user)
 
 @app.route("/play", methods=["GET"])
 def play():
@@ -266,6 +266,26 @@ def stand():
     g["round_active"] = False
     Players.save()
     return redirect(url_for("play"))
+
+@app.route("/deposit", methods=["GET", "POST"])
+def deposit():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        try:
+            amount = int(request.form["amount"])
+            if amount <= 0:
+                flash("Deposit must be greater than 0. Try again")
+            
+            user.balance += amount
+            Players.save()
+            return redirect(url_for("home"))
+        except ValueError:
+            flash("Please enter a valid number")
+            return redirect(url_for("deposit"))
+    return render_template("deposit.html", user=user)
 
 if __name__ == "__main__":
     app.run(debug=True)

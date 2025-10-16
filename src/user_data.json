@@ -9,5 +9,15 @@
             500,
             500
         ]
+    },
+    {
+        "name": "fern",
+        "password": "$2b$12$xtE1UUz4JOUB4ELcU8EgiujQjCuTNbnveinQBCgmJ7kgI2AHuNN12",
+        "balance": 600,
+        "wins": 0,
+        "losses": 0,
+        "balance_history": [
+            500
+        ]
     }
 ]
