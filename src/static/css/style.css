@@ -58,6 +58,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 20px 100px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 header a {
@@ -65,7 +66,7 @@ header a {
 }
 
 .content {
-  width: 70%;
+  max-width: 1200px;
   margin: 70px auto;
 }
 
@@ -113,6 +114,8 @@ display: flex;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   margin-top: 50px;
   gap: 1rem;
+  justify-content: center;
+  justify-items: center;
 }
 
 .card {
@@ -152,4 +155,10 @@ display: flex;
 .card-content span{
 display: inline-block;
 margin-top: 20px;
+}
+
+/* Deposit page */
+
+.deposit-form-container {
+  text-align: center;
 }

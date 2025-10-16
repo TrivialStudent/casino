@@ -2,7 +2,7 @@
     {
         "name": "lorcan",
         "password": "$2b$12$bdBw.I9VpaO6R56K5Fwv8u8ovyLdrgPDPpt15lKw4Ola4wxi/DxOy",
-        "balance": 500,
+        "balance": 3000,
         "wins": 0,
         "losses": 0,
         "balance_history": [
@@ -14,6 +14,16 @@
         "name": "fern",
         "password": "$2b$12$xtE1UUz4JOUB4ELcU8EgiujQjCuTNbnveinQBCgmJ7kgI2AHuNN12",
         "balance": 600,
+        "wins": 0,
+        "losses": 0,
+        "balance_history": [
+            500
+        ]
+    },
+    {
+        "name": "asdfg",
+        "password": "$2b$12$XBY3iJphu.2b.GHFrnl7MO1oYy8BTKMBgIxuYHlrX5NYEZE.KTL0m",
+        "balance": 500,
         "wins": 0,
         "losses": 0,
         "balance_history": [

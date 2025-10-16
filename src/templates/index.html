@@ -1,25 +1,13 @@
 {% extends "base.html" %}
 {% block body %}
-<header>
-  <a href="{{ url_for('home') }}"><h2>Fake Casino</h2></a>
-  <nav>
-    <div class="dropdown">
-      <span>Profile<i class="fa-solid fa-caret-down"></i></span>
-      <div class="dropdown-content">
-        <p>Balance: {{user.balance}}</p>
-        <a href="{{ url_for('deposit') }}">Deposit</a>
-        <a href="{{ url_for('stats') }}">Dashboard</a>
-        <a href="{{ url_for('logout') }}">Log out</a>
-      </div>
-    </div>
-  </nav>
-</header>
+
+{% include "navbar.html" %}
 
 <div class="content">
   <div class="card-grid">
     <div class="card">
       <div class="card-img">
-        <img src="{{ url_for('static', filename='img/blackjack.jpg') }}" alt="">
+        <img src="{{ url_for('static', filename='img/blackjack.gif') }}" alt="">
       </div>
       <div class="card-content">
         <h3>Blackjack</h3>

@@ -107,7 +107,7 @@ def signup():
 
         player = Player(username, password)
         Players.add_player(player)
-        flash("Account created. Please log in.")
+        flash("Account created. Please log in.", "success")
         return redirect(url_for("login"))
 
     return render_template("signup.html")
@@ -127,7 +127,7 @@ def login():
         # Verify
         if bcrypt.checkpw(password.encode("utf-8"), player.password):
             session["user"] = player.name
-            flash(f"Welcome back, {player.name}!")
+            flash(f"Welcome back, {player.name}!", "success")
             return redirect(url_for("home"))
         else:
             flash("Wrong password.")
@@ -138,7 +138,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.pop("user", None)
-    flash("Logged out.")
+    flash("Logged out.", "success")
     return redirect(url_for("login"))
 
 @app.route("/home")
@@ -208,7 +208,7 @@ def hit():
         return redirect(url_for("login"))
     g = ensure_game(user)
     if not g["round_active"]:
-        flash("No active round. Place a bet.")
+        flash("No active round. Place a bet.", "success")
         return redirect(url_for("play"))
 
     user.cards.add(g["deck"].draw())
@@ -276,12 +276,12 @@ def deposit():
     if request.method == "POST":
         try:
             amount = int(request.form["amount"])
-            if amount <= 0:
-                flash("Deposit must be greater than 0. Try again")
-            
-            user.balance += amount
-            Players.save()
-            return redirect(url_for("home"))
+            if amount <= 0 or amount > 1000:
+                flash("Deposit must be greater than 0, and you can't deposit more than 1000 fake money. Try again")
+            else:
+                user.balance += amount
+                Players.save()
+                return redirect(url_for("home"))
         except ValueError:
             flash("Please enter a valid number")
             return redirect(url_for("deposit"))

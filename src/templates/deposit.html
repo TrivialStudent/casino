@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% include "navbar.html" %}
+
 <div class="content">
+  <div class="deposit-form-container">
     <h3>Deposit funds</h3>
     <form action="" method="POST">
         <div class="row">
@@ -12,5 +15,6 @@
             <button type="submit" class="btn-green">Add Funds</button>
           </div>
     </form>
+  </div>
 </div>
 {% endblock body %}
