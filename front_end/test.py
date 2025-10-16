@@ -73,7 +73,7 @@ def render_player(user: Player):
 def index():
     if session.get("user"):
         return redirect(url_for("play"))
-    return redirect(url_for("login"))
+    return redirect(url_for("signup"))
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():

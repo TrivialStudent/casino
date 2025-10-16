@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 <h2>Sign up</h2>
-<div class="box">
+<div class="centuredbox">
   <form method="post">
     <div class="row">
       <label>Username</label><br />
@@ -11,9 +11,10 @@
       <label>Password</label><br />
       <input name="password" type="password" required />
     </div>
-    <div class="row">
-      <button type="submit">Create account</button>
-      <a href="{{ url_for('login') }}">or Log in</a>
+    <div class="row" style="text-align:center">
+      <button type="submit">Create account</button><br />
+      <span class="small-text"> or </span><br />
+      <a href="{{ url_for('login') }}">Log in</a>
     </div>
   </form>
 </div>
