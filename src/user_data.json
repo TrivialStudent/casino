@@ -29,5 +29,15 @@
         "balance_history": [
             500
         ]
+    },
+    {
+        "name": "test",
+        "password": "$2b$12$yKNQDQqyzLlH/N7UQOGC2uJ/96ADP1ArGe/A4JsJT0VvwCwVODmwy",
+        "balance": 500,
+        "wins": 0,
+        "losses": 0,
+        "balance_history": [
+            500
+        ]
     }
 ]

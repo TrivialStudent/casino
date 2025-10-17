@@ -11,13 +11,13 @@
   <title>Fake Casino</title>
 </head>
 <body>
-  {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash">
-          {% for m in messages %}{{ m }}<br/>{% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-    {% block body %}{% endblock %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block body %}{% endblock %}
 </body>
 </html>

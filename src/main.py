@@ -1,8 +1,10 @@
+import json
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from src.blackjack.deck import Deck
-from src.blackjack.hand import Hand
-from src.blackjack.dealer import Dealer
-from src.blackjack.player import Player, Players
+from blackjack.deck import Deck
+from blackjack.hand import Hand
+from blackjack.dealer import Dealer
+from blackjack.player import Player, Players
 
 import bcrypt
 
@@ -15,6 +17,9 @@ TEMPLATE_DIR = BASE_DIR / "templates"
 app = Flask(__name__, template_folder=str(TEMPLATE_DIR))
 
 app.secret_key = "dev-secret"  # replace in production
+
+app.config['SESSION_PERMANENT'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = 600 #10 minutes
 
 Players.load()
 
@@ -68,12 +73,27 @@ def render_player(user: Player):
     cards_text = ", ".join(str(c) for c in user.cards.cards)
     return f"Player cards: [{cards_text}], total value: {user.cards.value()}"
 
-
+# ------------- Routes ---------------
 @app.route("/")
 def index():
     if session.get("user"):
-        return redirect(url_for("play"))
-    return redirect(url_for("signup"))
+        return redirect(url_for("home"))
+    return redirect(url_for("login"))
+
+@app.route("/stats")
+def stats():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    win_ratio = round(user.win_ratio() * 100, 2)
+    return render_template(
+        "stats.html",
+        user=user,
+        win_ratio=win_ratio,
+        balance_history=json.dumps(user.balance_history)
+    )
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -81,16 +101,16 @@ def signup():
         username = request.form["username"].strip()
         password = request.form["password"]
         if not username or not password:
-            flash("Username and password required.")
+            flash("Username and password required.", "error")
             return redirect(url_for("signup"))
         if any(p.name == username for p in Players.list_of_players):
-            flash("Username already exists.")
+            flash("Username already exists.", "error")
             return redirect(url_for("signup"))
 
 
         player = Player(username, password)
         Players.add_player(player)
-        flash("Account created. Please log in.")
+        flash("Account created. Please log in.", "success")
         return redirect(url_for("login"))
 
     return render_template("signup.html")
@@ -104,16 +124,16 @@ def login():
         # Find user
         player = next((p for p in Players.list_of_players if p.name == username), None)
         if not player:
-            flash("No such user.")
+            flash("User does not exist.", "error")
             return redirect(url_for("login"))
 
         # Verify
         if bcrypt.checkpw(password.encode("utf-8"), player.password):
             session["user"] = player.name
-            flash(f"Welcome back, {player.name}!")
-            return redirect(url_for("play"))
+            flash(f"Welcome back, {player.name}!", "success")
+            return redirect(url_for("home"))
         else:
-            flash("Wrong password.")
+            flash("Wrong password.", "error")
             return redirect(url_for("login"))
 
     return render_template("login.html")
@@ -121,8 +141,15 @@ def login():
 @app.route("/logout")
 def logout():
     session.pop("user", None)
-    flash("Logged out.")
+    flash("Logged out.", "success")
     return redirect(url_for("login"))
+
+@app.route("/home")
+def home():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+    return render_template("index.html", user=user)
 
 @app.route("/play", methods=["GET"])
 def play():
@@ -146,13 +173,13 @@ def bet():
 
     g = ensure_game(user)
     if g["round_active"]:
-        flash("Round already in progress.")
+        flash("Round already in progress.", "info")
         return redirect(url_for("play"))
 
     try:
         amount = int(request.form["amount"])
         if amount < 1:
-            flash("Minimum bet is 1.")
+            flash("Minimum bet is 1.", "error")
             return redirect(url_for("play"))
         # start a round (no input/print; call backend)
         user.cards = Hand()
@@ -173,7 +200,7 @@ def bet():
             render_player(user)
         )
     except ValueError:
-        flash("Enter a valid integer bet.")
+        flash("Enter a valid integer bet.", "error")
 
     return redirect(url_for("play"))
 
@@ -184,7 +211,7 @@ def hit():
         return redirect(url_for("login"))
     g = ensure_game(user)
     if not g["round_active"]:
-        flash("No active round. Place a bet.")
+        flash("No active round. Place a bet.", "info")
         return redirect(url_for("play"))
 
     user.cards.add(g["deck"].draw())
@@ -210,7 +237,7 @@ def stand():
         return redirect(url_for("login"))
     g = ensure_game(user)
     if not g["round_active"]:
-        flash("No active round. Place a bet.")
+        flash("No active round. Place a bet.", "info")
         return redirect(url_for("play"))
 
     log(g, "Player stands.", "Revealing dealer hand...")
@@ -243,6 +270,25 @@ def stand():
     Players.save()
     return redirect(url_for("play"))
 
+@app.route("/deposit", methods=["GET", "POST"])
+def deposit():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        try:
+            amount = int(request.form["amount"])
+            if amount <= 0 or amount > 9999999:
+                flash("Deposit must be greater than 0, and you can't deposit more than 9999999. Try again", "error")
+            else:
+                user.balance += amount
+                Players.save()
+                return redirect(url_for("home"))
+        except ValueError:
+            flash("Please enter a valid number", "error")
+            return redirect(url_for("deposit"))
+    return render_template("deposit.html", user=user)
+
 if __name__ == "__main__":
     app.run(debug=True)
-
