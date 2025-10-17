@@ -4,10 +4,11 @@
       <div class="dropdown">
         <span>Profile<i class="fa-solid fa-caret-down"></i></span>
         <div class="dropdown-content">
-          <p>Balance: {{user.balance}}</p>
-          <a href="{{ url_for('deposit') }}">Deposit</a>
-          <a href="{{ url_for('stats') }}">Dashboard</a>
-          <a href="{{ url_for('logout') }}">Log out</a>
+          <p>{{ user.name }}</p>
+          <p>Balance: ${{user.balance}}</p>
+          <a href="{{ url_for('deposit') }}" class="menu-link">Deposit</a>
+          <a href="{{ url_for('stats') }}" class="menu-link">Dashboard</a>
+          <a href="{{ url_for('logout') }}" class="logout-red">Log out</a>
         </div>
       </div>
     </nav>
