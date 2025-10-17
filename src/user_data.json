@@ -42,5 +42,22 @@
         "balance_history": [
             500
         ]
+    },
+    {
+        "name": "alan",
+        "password": "$2b$12$NIXg3aPhlZAtLP7c8fz0gOGC.m/V.TS.0O1rm91qVhroi6PBVZeDe",
+        "balance": 1020,
+        "wins": 3,
+        "losses": 2,
+        "balance_history": [
+            500,
+            400,
+            800,
+            11801,
+            23602,
+            0,
+            20,
+            1020
+        ]
     }
 ]

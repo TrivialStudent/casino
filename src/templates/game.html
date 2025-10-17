@@ -9,24 +9,24 @@
     <div class="row"><strong>Balance:</strong> {{ user.balance }}</div>
   </div>
   
-  <div class="box" style="margin-top:1rem;">
+  <div class="box">
     {% if not round_active %}
       <form method="post" action="{{ url_for('bet') }}">
-        <label>Place bet</label>
+        <label><strong>Place bet</strong></label>
         <input type="number" name="amount" min="1" required />
-        <button type="submit">Deal</button>
+        <button type="submit" class="btn-green">Deal</button>
       </form>
     {% else %}
       <form method="post" action="{{ url_for('hit') }}">
-        <button type="submit">Hit</button>
+        <button type="submit" class="btn-green">Hit</button>
       </form>
       <form method="post" action="{{ url_for('stand') }}">
-        <button type="submit">Stand</button>
+        <button type="submit" class="btn-green">Stand</button>
       </form>
     {% endif %}
   </div>
   
-  <div class="box" style="margin-top:1rem;">
+  <div class="box">
     <div class="log">{{ log }}</div>
   </div>
 </div>
