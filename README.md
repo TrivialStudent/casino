@@ -97,16 +97,29 @@ Make sure you have Python installed on your system:
    ```sh
    cd repo_name
    ```
-3. Install required Python packages
+3. Create a virtual environment
+   ```sh
+   python -m venv .venv
+   ```
+4. Activate the virtual environment
+   - On Windows:
+   ```sh
+     .venv\Scripts\activate
+   ```
+   - On macOS/Linux:
+   ```sh
+     source .venv/bin/activate
+   ```
+5. Install required Python packages
    ```sh
    pip install -r requirements.txt
    ```
-4. Navigate inside src and run the application
+6. Navigate inside src and run the application
    ```sh
    cd src
    python main.py
    ```
-5. Open your browser and click on the Flask app link displayed in the terminal (typically `http://127.0.0.1:5000/`)
+7. Open your browser and click on the Flask app link displayed in the terminal (typically `http://127.0.0.1:5000/`)
 
 
 
