@@ -101,8 +101,9 @@ Make sure you have Python installed on your system:
    ```sh
    pip install -r requirements.txt
    ```
-4. Run the application
+4. Navigate inside src and run the application
    ```sh
+   cd src
    python main.py
    ```
 5. Open your browser and click on the Flask app link displayed in the terminal (typically `http://127.0.0.1:5000/`)
@@ -132,14 +133,14 @@ Make sure you have Python installed on your system:
 
 ### Contribution Log
 
-| Date | Alan | Loli | Angelina | Lorcan |
-|:----:|:-----|:-----|:---------|:-------|
+| Date | Alan | Loli | Angelina | Lorcan                                                                                                                                                     |
+|:----:|:-----|:-----|:---------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Role** | **Chief Frontend Architect & Cross-Platform Synergy Coordinator** | **User Interface Optimization Specialist & Debug Infrastructure Lead** | **Visual Systems Engineer & Template Architecture Consultant** | **Project Lead & Chief Architect of Backend Infrastructure, Security Paradigms, Statistical Visualization Frameworks & Repository Documentation Strategy** |
-| **10/13** | SRS document | SRS and documentation | Use Case Diagram | Blackjack implementation, secure login with hashed passwords, Flask webapp setup, Class diagram |
-| **10/14** | Fixed filepath issues for Mac, improved UI significantly | Debugging | Improved login UI | Stats page (charts, balance, win ratio) |
-| **10/15** | Menu & profile pages, deposit page | - | - | Added gifs, integrated stats page |
-| **10/16** | Navbar & responsive grid | Enhanced login & signup pages with styles | UI template improvements | Created README.md, improved sign-in/login UI |
-| **Summary** | UI/UX, Pages, Cross-platform fixes | Frontend styling, Debugging | UI templates, Diagrams | Backend logic, Security, Stats, Documentation |
+| **10/13** | SRS document | SRS and documentation | Use Case Diagram | Blackjack implementation, secure login with hashed passwords, Flask webapp setup, Class diagram                                                            |
+| **10/14** | Fixed filepath issues for Mac, improved UI significantly | Debugging | Improved login UI | Stats page (charts, balance, win ratio)                                                                                                                    |
+| **10/15** | Menu & profile pages, deposit page | - | - | Added gifs, integrated stats page                                                                                                                          |
+| **10/16** | Navbar & responsive grid | Enhanced login & signup pages with styles | UI template improvements | Created README.md, improved sign-in/login UI, added custom flash warnings                                                                                  |
+| **Summary** | UI/UX, Pages, Cross-platform fixes | Frontend styling, Debugging | UI templates, Diagrams | Backend logic, Security, Stats, Documentation                                                                                                              |
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
