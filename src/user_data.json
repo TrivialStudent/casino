@@ -2,15 +2,16 @@
     {
         "name": "lorcan",
         "password": "$2b$12$bdBw.I9VpaO6R56K5Fwv8u8ovyLdrgPDPpt15lKw4Ola4wxi/DxOy",
-        "balance": 111,
+        "balance": 11,
         "wins": 2,
-        "losses": 1,
+        "losses": 2,
         "balance_history": [
             500,
             500,
             4111,
             8111,
-            111
+            111,
+            11
         ]
     },
     {
