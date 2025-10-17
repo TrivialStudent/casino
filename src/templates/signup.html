@@ -1,20 +1,27 @@
 {% extends "base.html" %}
 {% block body %}
-<h2>Sign up</h2>
-<div class="box">
-  <form method="post">
-    <div class="row">
-      <label>Username</label><br />
-      <input name="username" type="text" required />
-    </div>
-    <div class="row">
-      <label>Password</label><br />
-      <input name="password" type="password" required />
-    </div>
-    <div class="row">
-      <button type="submit">Create account</button>
-      <a href="{{ url_for('login') }}">or Log in</a>
-    </div>
-  </form>
+<div class="auth-container">
+  <div class="auth-box">
+    <h2>Create Account</h2>
+    <p class="subtitle">Join All In Santos and get rich today</p>
+
+    <form method="post">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" placeholder="Choose a username" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="Choose a password" required />
+      </div>
+
+      <button type="submit" class="btn-primary">Sign Up</button>
+
+      <div class="auth-footer">
+        <p>Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
