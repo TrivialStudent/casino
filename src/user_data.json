@@ -1,64 +1,13 @@
 [
     {
-        "name": "lorcan",
-        "password": "$2b$12$bdBw.I9VpaO6R56K5Fwv8u8ovyLdrgPDPpt15lKw4Ola4wxi/DxOy",
-        "balance": 11,
-        "wins": 2,
-        "losses": 2,
-        "balance_history": [
-            500,
-            500,
-            4111,
-            8111,
-            111,
-            11
-        ]
-    },
-    {
-        "name": "fern",
-        "password": "$2b$12$xtE1UUz4JOUB4ELcU8EgiujQjCuTNbnveinQBCgmJ7kgI2AHuNN12",
-        "balance": 600,
-        "wins": 0,
-        "losses": 0,
-        "balance_history": [
-            500
-        ]
-    },
-    {
-        "name": "asdfg",
-        "password": "$2b$12$XBY3iJphu.2b.GHFrnl7MO1oYy8BTKMBgIxuYHlrX5NYEZE.KTL0m",
+        "name": "lop123",
+        "pref_name": "Lorcan The Gambler",
+        "password": "$2b$12$h6qjW/4AuzGHvyJ60Ql0out1.RIJFTB5NxT66Oi6fylnl30AWs12i",
         "balance": 500,
         "wins": 0,
         "losses": 0,
         "balance_history": [
             500
-        ]
-    },
-    {
-        "name": "test",
-        "password": "$2b$12$yKNQDQqyzLlH/N7UQOGC2uJ/96ADP1ArGe/A4JsJT0VvwCwVODmwy",
-        "balance": 500,
-        "wins": 0,
-        "losses": 0,
-        "balance_history": [
-            500
-        ]
-    },
-    {
-        "name": "alan",
-        "password": "$2b$12$NIXg3aPhlZAtLP7c8fz0gOGC.m/V.TS.0O1rm91qVhroi6PBVZeDe",
-        "balance": 1020,
-        "wins": 3,
-        "losses": 2,
-        "balance_history": [
-            500,
-            400,
-            800,
-            11801,
-            23602,
-            0,
-            20,
-            1020
         ]
     }
 ]
