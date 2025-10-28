@@ -1,13 +1,1 @@
-[
-    {
-        "name": "lop123",
-        "pref_name": "Lorcan The Gambler",
-        "password": "$2b$12$h6qjW/4AuzGHvyJ60Ql0out1.RIJFTB5NxT66Oi6fylnl30AWs12i",
-        "balance": 500,
-        "wins": 0,
-        "losses": 0,
-        "balance_history": [
-            500
-        ]
-    }
-]
+[]
