@@ -60,5 +60,22 @@
             20,
             1020
         ]
+    },
+    {
+        "name": "kevin santos",
+        "password": "$2b$12$Cdi/8KoSxOyNgeJHm4gSr.RJ6sPsxU/OxS5Vk2wA34tR/T3KP5gT.",
+        "balance": 0,
+        "wins": 1,
+        "losses": 2,
+        "balance_history": [
+            500,
+            500,
+            0,
+            100000,
+            109999,
+            109999,
+            109999,
+            0
+        ]
     }
 ]
