@@ -51,7 +51,7 @@ class Player:
         self.balance_history.append(self.balance)
 
     def __str__(self):
-        return f"name: {self.name}, balance: {self.balance}, wins: {self.wins}, losses: {self.losses}, password: {self.password}"
+        return f"name: {self.name}, balance: {self.balance}, wins: {self.wins}, losses: {self.losses}, password: {self.password}, total_winnings: {self.total_winnings}, total_losses: {self.total_losses}"
 
 class Players:
     list_of_players = []
@@ -68,7 +68,7 @@ class Players:
         cls.save()
     @classmethod
     def save(cls):
-        json_data = [{"name": p.name, "password": p.password.decode("utf-8"), "balance": p.balance, "wins": p.wins, "losses": p.losses, "balance_history": p.balance_history} for p in cls.list_of_players]
+        json_data = [{"name": p.name, "password": p.password.decode("utf-8"), "balance": p.balance, "wins": p.wins, "losses": p.losses,"total_winnings": p.total_winnings, "total_losses" : p.total_losses, "balance_history": p.balance_history} for p in cls.list_of_players]
         cls.file.write_text(json.dumps(json_data, indent=4))
     @classmethod
     def load(cls):
@@ -82,6 +82,8 @@ class Players:
                     p["wins"],
                     p["losses"],
                     p["balance_history"],
+                   
+                 
                     hashed=True
                 )
                 cls.list_of_players.append(player)
