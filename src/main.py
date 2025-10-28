@@ -131,7 +131,7 @@ def login():
         # Verify
         if bcrypt.checkpw(password.encode("utf-8"), player.password):
             session["user"] = player.name
-            flash(f"Welcome back, {player.pref_name}!", "success")
+            flash(f"Welcome, {player.pref_name}!", "success")
             return redirect(url_for("home"))
         else:
             flash("Wrong password.", "error")
