@@ -10,6 +10,8 @@ class Player:
         self.bet = 0
         self.wins = wins
         self.losses = losses
+        self.total_winnings = 0
+        self.total_losses = 0
         self.balance_history = balance_history if balance_history else [balance]
         if password is None:
             self.password = None
@@ -24,6 +26,7 @@ class Player:
         self.balance -= amount
     def win(self):
         self.balance += self.bet * 2
+        self.total_winnings += self.bet
         self.record_balance()
         self.wins += 1
     def tie(self):
@@ -31,6 +34,7 @@ class Player:
         self.record_balance()
         self.bet = 0
     def lose(self):
+        self.total_losses += self.bet
         self.bet = 0
         self.record_balance()
         self.losses += 1
