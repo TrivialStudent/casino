@@ -48,6 +48,11 @@ a {
 text-decoration: none;
 }
 
+.user-info {
+  display: flex;
+  align-items: center;    
+  justify-content: center;
+}
 .dropdown {
 position: relative;
 display: inline-block;
