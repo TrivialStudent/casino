@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import bcrypt
 class Player:
-    def __init__(self, name, password, pref_name, balance=500,wins=0,losses=0, balance_history=None, hashed=False):
+    def __init__(self, name, password, balance=500,wins=0,losses=0, balance_history=None, total_winnings=0, total_losses=0, hashed=False):
         self.name = name
         self.pref_name = pref_name
         self.balance = balance
@@ -11,6 +11,8 @@ class Player:
         self.bet = 0
         self.wins = wins
         self.losses = losses
+        self.total_winnings = total_winnings
+        self.total_losses = total_losses
         self.balance_history = balance_history if balance_history else [balance]
         if password is None:
             self.password = None
@@ -25,6 +27,7 @@ class Player:
         self.balance -= amount
     def win(self):
         self.balance += self.bet * 2
+        self.total_winnings += self.bet
         self.record_balance()
         self.wins += 1
     def tie(self):
@@ -32,6 +35,7 @@ class Player:
         self.record_balance()
         self.bet = 0
     def lose(self):
+        self.total_losses += self.bet
         self.bet = 0
         self.record_balance()
         self.losses += 1
@@ -48,7 +52,8 @@ class Player:
         self.balance_history.append(self.balance)
 
     def __str__(self):
-        return f"name: {self.name}, preferred name: {self.pref_name}, balance: {self.balance}, wins: {self.wins}, losses: {self.losses}, password: {self.password}"
+        return f"name: {self.name}, balance: {self.balance}, wins: {self.wins}, losses: {self.losses}, password: {self.password}, total_winnings: {self.total_winnings}, total_losses: {self.total_losses}, total_winnings: {self.total_winnings}, total_losses: {self.total_losses}"
+
 
 class Players:
     list_of_players = []
@@ -65,7 +70,7 @@ class Players:
         cls.save()
     @classmethod
     def save(cls):
-        json_data = [{"name": p.name, "pref_name": p.pref_name, "password": p.password.decode("utf-8"), "balance": p.balance, "wins": p.wins, "losses": p.losses, "balance_history": p.balance_history} for p in cls.list_of_players]
+        json_data = [{"name": p.name, "pref_name": p.pref_name, "password": p.password.decode("utf-8"), "balance": p.balance, "wins": p.wins, "losses": p.losses, "total_winnings": p.total_winnings, "total_losses": p.total_losses, "balance_history": p.balance_history} for p in cls.list_of_players]
         cls.file.write_text(json.dumps(json_data, indent=4))
     @classmethod
     def load(cls):
@@ -80,6 +85,9 @@ class Players:
                     p["wins"],
                     p["losses"],
                     p["balance_history"],
+                    total_winnings=p.get("total_winnings", 0),
+                    total_losses=p.get("total_losses", 0),
+                 
                     hashed=True
                 )
                 cls.list_of_players.append(player)

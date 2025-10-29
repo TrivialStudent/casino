@@ -7,7 +7,13 @@
     <p><strong>Wins:</strong> {{ user.wins }}</p>
     <p><strong>Losses:</strong> {{ user.losses }}</p>
     <p><strong>Win Ratio:</strong> {{ win_ratio }}%</p>
-    
+    <p><strong>Net Earnings for this session:</strong>
+        {% if net_earnings >= 0 %}
+            <span style="color:green;">+${{ net_earnings }}</span>
+        {% else %}
+            <span style="color:red;">${{ net_earnings }}</span>
+        {% endif %}
+    </p>
     <div class="chart-container">
       <canvas id="statsChart"></canvas>
     </div>
