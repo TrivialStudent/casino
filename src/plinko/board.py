@@ -29,7 +29,7 @@ class Board():
     def draw_obstacles(self,obstacles):
         for obstacle in obstacles:
             posx, posy = int(obstacle.body.position.x), int(obstacle.body.position.y)
-            pygame.draw.circle(self.display,(255,255,255), (posx, posy), OBSTACLE_RAD)
+            pygame.draw.circle(self.display,(175,200,255), (posx, posy), OBSTACLE_RAD)
     def spawn_obstacle(self, pos, space):
         body = pymunk.Body(body_type=pymunk.Body.STATIC)
         body.position = pos

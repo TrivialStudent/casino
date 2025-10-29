@@ -1,5 +1,7 @@
-import pygame, pymunk
+import pygame, pymunk, random
 from board import *
+from ball import *
+
 
 
 class Plinko:
@@ -11,30 +13,36 @@ class Plinko:
         self.delta_time = 0
 
         self.space = pymunk.Space()
-        self.space.gravity = (100,1000)
+        self.space.gravity = (0,1000)
 
         self.plinko_balls = pygame.sprite.Group()
         self.board = Board(self.space)
 
     def start(self):
         while True:
+            self.delta_time = self.clock.tick(60) / 1000.0
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        random_x = 1920 // 2 + random.choice([random.randint(-10,-1), random.randint(1,10)])
+                        self.ball = Ball((random_x, 20), self.space, self.board, self.delta_time)
+                        self.plinko_balls.add(self.ball)
 
-            self.delta_time = self.clock.tick(60) / 1000.0
+
 
             self.screen.fill((0, 0, 0))
 
-            # Update physics
+
             self.space.step(self.delta_time)
 
-            # Draw everything
+
             self.board.update()
+            self.plinko_balls.update()
             self.plinko_balls.draw(self.screen)
 
-            # NOW flip
             pygame.display.flip()
 
 
