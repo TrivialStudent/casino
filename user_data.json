@@ -2,11 +2,11 @@
     {
         "name": "33",
         "password": "$2b$12$eSglVzDHdV6CWPQ0zVFjke123xYVN44vP8fN9CXLGIS2h7e2qhoIW",
-        "balance": 11836,
-        "wins": 10,
+        "balance": 11860,
+        "wins": 13,
         "losses": 10,
-        "total_winnings": 0,
-        "total_losses": 100,
+        "total_winnings": 23,
+        "total_losses": 0,
         "balance_history": [
             500,
             500,
@@ -28,7 +28,10 @@
             11979,
             11845,
             11836,
-            11836
+            11836,
+            11837,
+            11849,
+            11860
         ]
     },
     {

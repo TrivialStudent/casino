@@ -92,6 +92,7 @@ def stats():
         "stats.html",
         user=user,
         win_ratio=win_ratio,
+        total_winnings=user.total_winnings,
         losses=user.total_losses,
         net_earnings=net_earnings,
         balance_history=json.dumps(user.balance_history)

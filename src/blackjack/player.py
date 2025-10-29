@@ -3,15 +3,15 @@ import json
 from pathlib import Path
 import bcrypt
 class Player:
-    def __init__(self, name, password, balance=500,wins=0,losses=0, balance_history=None, hashed=False):
+    def __init__(self, name, password, balance=500,wins=0,losses=0, balance_history=None, total_winnings=0, total_losses=0, hashed=False):
         self.name = name
         self.balance = balance
         self.cards = Hand()
         self.bet = 0
         self.wins = wins
         self.losses = losses
-        self.total_winnings = 0
-        self.total_losses = 0
+        self.total_winnings = total_winnings
+        self.total_losses = total_losses
         self.balance_history = balance_history if balance_history else [balance]
         if password is None:
             self.password = None
@@ -82,7 +82,8 @@ class Players:
                     p["wins"],
                     p["losses"],
                     p["balance_history"],
-                   
+                    total_winnings=p.get("total_winnings", 0),
+                    total_losses=p.get("total_losses", 0),
                  
                     hashed=True
                 )
