@@ -2,8 +2,10 @@
 {% block body %}
 
 {% include "navbar.html" %}
-
 <div class="content">
+  <div class="user-info">
+        <p><strong>Balance:</strong> ${{ user.balance }}</p>
+  </div>
   <div class="card-grid">
     <div class="card">
       <div class="card-img">
