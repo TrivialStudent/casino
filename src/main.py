@@ -104,6 +104,7 @@ def signup():
     if request.method == "POST":
         username = request.form["username"].strip()
         password = request.form["password"]
+        pref_name = request.form["pref_name"].strip()
         if not username or not password:
             flash("Username and password required.", "error")
             return redirect(url_for("signup"))
@@ -112,7 +113,7 @@ def signup():
             return redirect(url_for("signup"))
 
 
-        player = Player(username, password)
+        player = Player(username,password, pref_name)
         Players.add_player(player)
         flash("Account created. Please log in.", "success")
         return redirect(url_for("login"))
@@ -134,7 +135,7 @@ def login():
         # Verify
         if bcrypt.checkpw(password.encode("utf-8"), player.password):
             session["user"] = player.name
-            flash(f"Welcome back, {player.name}!", "success")
+            flash(f"Welcome, {player.pref_name}!", "success")
             return redirect(url_for("home"))
         else:
             flash("Wrong password.", "error")

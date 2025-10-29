@@ -5,6 +5,7 @@ import bcrypt
 class Player:
     def __init__(self, name, password, balance=500,wins=0,losses=0, balance_history=None, total_winnings=0, total_losses=0, hashed=False):
         self.name = name
+        self.pref_name = pref_name
         self.balance = balance
         self.cards = Hand()
         self.bet = 0
@@ -51,7 +52,8 @@ class Player:
         self.balance_history.append(self.balance)
 
     def __str__(self):
-        return f"name: {self.name}, balance: {self.balance}, wins: {self.wins}, losses: {self.losses}, password: {self.password}, total_winnings: {self.total_winnings}, total_losses: {self.total_losses}"
+        return f"name: {self.name}, balance: {self.balance}, wins: {self.wins}, losses: {self.losses}, password: {self.password}, total_winnings: {self.total_winnings}, total_losses: {self.total_losses}, total_winnings: {self.total_winnings}, total_losses: {self.total_losses}"
+
 
 class Players:
     list_of_players = []
@@ -68,7 +70,7 @@ class Players:
         cls.save()
     @classmethod
     def save(cls):
-        json_data = [{"name": p.name, "password": p.password.decode("utf-8"), "balance": p.balance, "wins": p.wins, "losses": p.losses,"total_winnings": p.total_winnings, "total_losses" : p.total_losses, "balance_history": p.balance_history} for p in cls.list_of_players]
+        json_data = [{"name": p.name, "pref_name": p.pref_name, "password": p.password.decode("utf-8"), "balance": p.balance, "wins": p.wins, "losses": p.losses, "total_winnings": p.total_winnings, "total_losses": p.total_losses, "balance_history": p.balance_history} for p in cls.list_of_players]
         cls.file.write_text(json.dumps(json_data, indent=4))
     @classmethod
     def load(cls):
@@ -77,6 +79,7 @@ class Players:
             for p in data:
                 player = Player(
                     p["name"],
+                    p["pref_name"],
                     p["password"],
                     p["balance"],
                     p["wins"],
@@ -96,7 +99,7 @@ class Players:
                 while True:
                     password = input("Enter password, or enter nothing to go back: ").strip()
                     if player.verify_password(password):
-                        print(f"Welcome back {player.name}")
+                        print(f"Welcome back {player.pref_name}")
                         return player
                     elif password == "":
                         break
