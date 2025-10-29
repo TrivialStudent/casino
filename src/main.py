@@ -87,10 +87,15 @@ def stats():
         return redirect(url_for("login"))
 
     win_ratio = round(user.win_ratio() * 100, 2)
+    net_earnings = user.total_winnings - user.total_losses
     return render_template(
         "stats.html",
         user=user,
+        pref_name = user.pref_name,
         win_ratio=win_ratio,
+        total_winnings=user.total_winnings,
+        losses=user.total_losses,
+        net_earnings=net_earnings,
         balance_history=json.dumps(user.balance_history)
     )
 
@@ -109,7 +114,7 @@ def signup():
             return redirect(url_for("signup"))
 
 
-        player = Player(username,password, pref_name)
+        player = Player(username, pref_name, password)
         Players.add_player(player)
         flash("Account created. Please log in.", "success")
         return redirect(url_for("login"))
@@ -131,7 +136,7 @@ def login():
         # Verify
         if bcrypt.checkpw(password.encode("utf-8"), player.password):
             session["user"] = player.name
-            flash(f"Welcome back, {player.pref_name}!", "success")
+            flash(f"Welcome, {player.pref_name}!", "success")
             return redirect(url_for("home"))
         else:
             flash("Wrong password.", "error")
