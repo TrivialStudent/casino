@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import bcrypt
 class Player:
-    def __init__(self, name, password, balance=500,wins=0,losses=0, balance_history=None, total_winnings=0, total_losses=0, hashed=False):
+    def __init__(self, name, pref_name, password, balance=500,wins=0,losses=0, balance_history=None, total_winnings=0, total_losses=0, hashed=False):
         self.name = name
         self.pref_name = pref_name
         self.balance = balance

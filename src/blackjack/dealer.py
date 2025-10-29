@@ -3,7 +3,7 @@ from .player import *
 
 class Dealer(Player):
     def __init__(self):
-        super().__init__(name="Dealer", password=None)
+        super().__init__(name="Dealer", password=None, pref_name="BOB")
 
     def deal(self, deck):
         return deck.draw()

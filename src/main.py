@@ -91,6 +91,7 @@ def stats():
     return render_template(
         "stats.html",
         user=user,
+        pref_name = user.pref_name,
         win_ratio=win_ratio,
         total_winnings=user.total_winnings,
         losses=user.total_losses,
@@ -113,7 +114,7 @@ def signup():
             return redirect(url_for("signup"))
 
 
-        player = Player(username,password, pref_name)
+        player = Player(username, pref_name, password)
         Players.add_player(player)
         flash("Account created. Please log in.", "success")
         return redirect(url_for("login"))
