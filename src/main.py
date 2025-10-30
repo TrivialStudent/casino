@@ -87,15 +87,10 @@ def stats():
         return redirect(url_for("login"))
 
     win_ratio = round(user.win_ratio() * 100, 2)
-    net_earnings = user.total_winnings - user.total_losses
     return render_template(
         "stats.html",
         user=user,
-        pref_name = user.pref_name,
         win_ratio=win_ratio,
-        total_winnings=user.total_winnings,
-        losses=user.total_losses,
-        net_earnings=net_earnings,
         balance_history=json.dumps(user.balance_history)
     )
 
@@ -112,12 +107,14 @@ def signup():
         if any(p.name == username for p in Players.list_of_players):
             flash("Username already exists.", "error")
             return redirect(url_for("signup"))
-
-
-        player = Player(username, pref_name, password)
+        player = Player(username,password, pref_name)
         Players.add_player(player)
-        flash("Account created. Please log in.", "success")
-        return redirect(url_for("login"))
+       
+        session["user"] = player.name
+        flash(f"Welcome {pref_name}! Your account has been created.", "success")
+        
+        return redirect(url_for("home"))
+    
 
     return render_template("signup.html")
 
