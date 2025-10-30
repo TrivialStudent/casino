@@ -1,1 +1,17 @@
-[]
+[
+    {
+        "name": "33",
+        "pref_name": "33",
+        "password": "$2b$12$5ctIcc4dp1CyALZ9gjNnEuepWVaM609GT/HkWu/C1bwaLo1b0KRea",
+        "balance": 1579,
+        "wins": 2,
+        "losses": 0,
+        "total_winnings": 78,
+        "total_losses": 0,
+        "balance_history": [
+            500,
+            533,
+            579
+        ]
+    }
+]

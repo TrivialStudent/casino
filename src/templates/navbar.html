@@ -1,5 +1,11 @@
 <header>
-    <a href="{{ url_for('home') }}"><h2>All In Santos</h2></a>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">  
+      {% if request.endpoint != 'home' %}
+        <a href="{{ url_for('home') }}" class="home-link" > <img src="{{ url_for('static', filename='img/home.png') }}" alt=""  style="width: 30px; height: 35px;" > </a> 
+      {% else %}
+        <a><h2>All In Santos</h2></a>
+      {% endif %}
+    </div> 
     <nav>
       <div class="dropdown">
         <span>Profile<i class="fa-solid fa-caret-down"></i></span>

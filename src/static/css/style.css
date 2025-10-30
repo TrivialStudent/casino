@@ -4,6 +4,31 @@
   box-sizing: border-box;
 }
 
+.home-link {
+position: relative;
+}
+.home-link::after {
+content: "Return to Home Page";
+color: #fff;
+position: absolute;
+bottom: 22%; left: 350%;
+transform: translateX(-50%);
+background-color: #000000;
+padding: 4px 8px;
+border-radius: 6px;
+font-size: 12px;
+white-space: nowrap;
+opacity: 0; transition: opacity 0.5s;
+}
+.home-link:hover::after {
+opacity: 1;
+}
+
+
+
+
+
+
 body {
 font-family: system-ui, sans-serif;
 }
