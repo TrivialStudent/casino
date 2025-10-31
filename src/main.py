@@ -10,8 +10,19 @@ import bcrypt
 
 import os
 import pathlib
+import subprocess, sys
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent
+PLINKO_DIR = (BASE_DIR / "plinko").resolve()     # e.g. C:\...\casino2\src\plinko
+PLINKO_MAIN = (PLINKO_DIR / "main.py").resolve()
+
+# Optional safety checks (helpful while debugging; remove later)
+if not PLINKO_DIR.is_dir():
+    raise RuntimeError(f"PLINKO_DIR not found: {PLINKO_DIR}")
+if not PLINKO_MAIN.is_file():
+    raise RuntimeError(f"PLINKO_MAIN not found: {PLINKO_MAIN}")
+
+
 TEMPLATE_DIR = BASE_DIR / "templates"
 
 app = Flask(__name__, template_folder=str(TEMPLATE_DIR))
@@ -98,6 +109,55 @@ def stats():
         net_earnings=net_earnings,
         balance_history=json.dumps(user.balance_history)
     )
+
+@app.route("/plinko", methods=["GET"])
+def plinko_page():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    # Minimal inline HTML to avoid creating a new template file
+    return f"""
+    <!doctype html>
+    <html><head><meta charset="utf-8"><title>Plinko</title></head>
+    <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin:2rem;">
+      <h1>Plinko</h1>
+      <p>Logged in as: <strong>{user.name}</strong></p>
+      <form method="post" action="{url_for('plinko_run')}">
+        <button type="submit" style="padding:.6rem 1rem; font-size:1rem;">Play Plinko</button>
+      </form>
+      <p style="margin-top:1rem; color:#666;">
+        A game window will open on the machine running this Flask app. Closing the window or pressing Q will save your balance to <code>user_data.json</code>.
+      </p>
+    </body></html>
+    """
+
+@app.route("/plinko/run", methods=["POST"])
+def plinko_run():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    env = os.environ.copy()
+    env["PLINKO_USER"] = user.name
+
+    if sys.platform.startswith("win"):
+        DETACHED = 0x00000008  # DETACHED_PROCESS
+        subprocess.Popen(
+            [sys.executable, str(PLINKO_MAIN)],
+            env=env,
+            creationflags=DETACHED,
+            close_fds=True
+        )
+    else:
+        subprocess.Popen(
+            [sys.executable, str(PLINKO_MAIN)],
+            env=env,
+            start_new_session=True,
+            close_fds=True
+        )
+
+    return ("", 204)
 
 
 @app.route("/signup", methods=["GET", "POST"])
