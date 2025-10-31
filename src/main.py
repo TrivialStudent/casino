@@ -16,12 +16,6 @@ BASE_DIR = pathlib.Path(__file__).resolve().parent
 PLINKO_DIR = (BASE_DIR / "plinko").resolve()     # e.g. C:\...\casino2\src\plinko
 PLINKO_MAIN = (PLINKO_DIR / "main.py").resolve()
 
-# Optional safety checks (helpful while debugging; remove later)
-if not PLINKO_DIR.is_dir():
-    raise RuntimeError(f"PLINKO_DIR not found: {PLINKO_DIR}")
-if not PLINKO_MAIN.is_file():
-    raise RuntimeError(f"PLINKO_MAIN not found: {PLINKO_MAIN}")
-
 
 TEMPLATE_DIR = BASE_DIR / "templates"
 
@@ -132,7 +126,7 @@ def plinko_page():
     </body></html>
     """
 
-@app.route("/plinko/run", methods=["POST"])
+@app.route("/plinko/run", methods=["POST", "GET"])
 def plinko_run():
     user = current_user()
     if not user:

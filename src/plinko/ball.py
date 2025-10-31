@@ -2,7 +2,7 @@
 import pygame, pymunk, os, random
 from pathlib import *
 from Multi import *
-BALL_RAD = 16
+BALL_RAD = 12
 
 class Ball(pygame.sprite.Sprite):
     def __init__(self, pos, space, board, delta_time, on_score=None):

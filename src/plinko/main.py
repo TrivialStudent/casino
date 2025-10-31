@@ -3,7 +3,7 @@ import pathlib
 import pygame, pymunk, random, json, os
 from board import Board
 from ball import Ball
-from Multi import multi_group, prev_multi_group  # groups live in Multi.py
+from Multi import multi_group, prev_multi_group, HEIGHT, WIDTH  # groups live in Multi.py
 
 class Plinko:
     def __init__(self):
@@ -26,13 +26,13 @@ class Plinko:
                          users[0] if users else {'name': uname, 'balance': 0, 'balance_history': []})
 
         self.balance_cents = int(self.user.get('balance', 0))
-        self.turns_total = max(0, self.balance_cents // 100)
+        self.turns_total = max(0, self.balance_cents )
         self.turns_left = self.turns_total
         self.session_winnings_cents = 0
         self.balls_in_play = 0
 
         self.font = pygame.font.SysFont(None, 30)
-        self.screen = pygame.display.set_mode((1920, 1080))
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         pygame.display.set_caption("Plinko")
         self.clock = pygame.time.Clock()
         self.delta_time = 0.0
@@ -45,15 +45,15 @@ class Plinko:
 
 
     def handle_score(self, multiplier):
-        payout_cents = int(round(float(multiplier) * 100))
+        payout_cents = int(round(float(multiplier)))
         self.session_winnings_cents += payout_cents
         self.balance_cents += payout_cents
-        self.turns_left = self.balance_cents // 100
+        self.turns_left = self.balance_cents
 
     def save_and_quit(self):
         users = json.loads(self.user_file.read_text()) if self.user_file.exists() else []
         for u in users:
-            if u.get('name') == self.user.get('pref_name'):
+            if u.get('pref_name') == self.user.get('pref_name'):
                 u['balance'] = int(self.balance_cents)
                 bh = u.get('balance_history') or []
                 bh.append(int(self.balance_cents))
@@ -62,25 +62,22 @@ class Plinko:
                 break
         else:
             users.append({
-                'name': self.user.get('name', 'guest'),
-                'balance': int(self.balance_cents),
+                'name': self.user.get('pref_name', 'guest'),
+                'balance': float(self.balance_cents),
                 'balance_history': [int(self.balance_cents)],
                 'total_winnings': int(self.session_winnings_cents)
             })
+
         self.user_file.write_text(json.dumps(users, indent=4))
         pygame.quit()
         raise SystemExit
 
-    def cents_to_str(self, cents: int) -> str:
-        sign = '-' if cents < 0 else ''
-        cents = abs(int(cents))
-        return f"{sign}${cents // 100}.{cents % 100:02d}"
 
     def draw_hud(self):
         lines = [
-            f"User: {self.user.get('name', '?')}",
-            f"Balance: {self.cents_to_str(self.balance_cents)}   Turns left: {self.turns_left}",
-            f"Winnings: {self.cents_to_str(self.session_winnings_cents)}",
+            f"User: {self.user.get('pref_name', '?')}",
+            f"Balance: {self.balance_cents}   Turns left: {self.turns_left}",
+            f"Winnings: {self.session_winnings_cents}",
             "[SPACE] drop ball   [Q] save+quit"
         ]
 
@@ -103,13 +100,13 @@ class Plinko:
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     self.save_and_quit()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    if self.balance_cents >= 100:
+                    if self.balance_cents >= 1:
                         self.turns_left -= 1
-                        self.balance_cents -= 100  # $1 per ball
-                        self.turns_left = self.balance_cents // 100
+                        self.balance_cents -= 1  # $1 per ball
+                        self.turns_left = self.balance_cents
 
                         self.ball_sound.play()
-                        random_x = 1920 // 2 + random.choice([random.randint(-10, -1), random.randint(1, 10)])
+                        random_x = WIDTH // 2 + random.choice([random.randint(-10, -1), random.randint(1, 10)])
                         ball = Ball((random_x, 20), self.space, self.board, self.delta_time, on_score=self.handle_score)
                         self.plinko_balls.add(ball)
 

@@ -1,8 +1,7 @@
 import pygame, pymunk
 from Multi import Multi, multi_group
+from Multi import WIDTH, HEIGHT
 
-HEIGHT = 1080
-WIDTH = 1920
 OBSTACLE_RAD = int(WIDTH / 240)
 OBSTACLE_PAD = int(HEIGHT / 19)
 MULTI_HEIGHT = int(HEIGHT / 19)

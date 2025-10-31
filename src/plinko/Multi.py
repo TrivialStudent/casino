@@ -1,6 +1,7 @@
 import pygame
-HEIGHT = 1080
-WIDTH = 1920
+HEIGHT = 720
+WIDTH  = 1280
+
 OBSTACLE_RAD = int(WIDTH / 240)
 OBSTACLE_PAD = int(HEIGHT / 19) + 20
 
