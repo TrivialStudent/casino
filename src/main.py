@@ -10,8 +10,31 @@ import bcrypt
 
 import os
 import pathlib
+import subprocess, sys
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent
+PLINKO_DIR = (BASE_DIR / "plinko").resolve()     # e.g. C:\...\casino2\src\plinko
+PLINKO_MAIN = (PLINKO_DIR / "main.py").resolve()
+
+USER_JSON  = (BASE_DIR / "user_data.json").resolve()
+
+_USERS_CACHE = []
+_USERS_MTIME = 0.0
+
+def _load_users_if_stale():
+    """Reloads the users cache when user_data.json has changed."""
+    global _USERS_CACHE, _USERS_MTIME
+    try:
+        mtime = USER_JSON.stat().st_mtime
+    except FileNotFoundError:
+        mtime = 0.0
+    if mtime != _USERS_MTIME:
+        _USERS_CACHE = json.loads(USER_JSON.read_text()) if USER_JSON.exists() else []
+        _USERS_MTIME = mtime
+    return _USERS_CACHE
+
+# refresh before every request so pages always reflect latest file contents
+
 TEMPLATE_DIR = BASE_DIR / "templates"
 
 app = Flask(__name__, template_folder=str(TEMPLATE_DIR))
@@ -72,8 +95,65 @@ def render_full_dealer(dealer: Dealer):
 def render_player(user: Player):
     cards_text = ", ".join(str(c) for c in user.cards.cards)
     return f"Player cards: [{cards_text}], total value: {user.cards.value()}"
+def _maybe_sync_logged_in_player_from_json():
+    user = current_user()
+    if not user:
+        return
+
+    users = _load_users_if_stale()
+
+    # find matching JSON record by name OR pref_name (both directions)
+    rec = next(
+        (u for u in users
+         if u.get('name') == user.name
+         or u.get('pref_name') == user.name
+         or u.get('name') == user.pref_name
+         or u.get('pref_name') == user.pref_name),
+        None
+    )
+    if rec is None:
+        return
+
+    # pull fresh values from JSON
+    try:
+        json_balance = int(float(rec.get('balance', user.balance)))
+    except (TypeError, ValueError):
+        json_balance = user.balance
+
+    json_hist = rec.get('balance_history') or []
+    json_wins = rec.get('total_winnings', user.total_winnings)
+    json_losses = rec.get('total_losses', user.total_losses)
+
+    # If JSON looks newer (longer history OR different last entry), adopt it.
+    if (json_hist and (
+        len(json_hist) > len(user.balance_history)
+        or json_hist[-1] != (user.balance_history[-1] if user.balance_history else None)
+    )):
+        user.balance = json_balance
+        user.balance_history = list(json_hist)
+        try:
+            user.total_winnings = int(float(json_wins))
+        except (TypeError, ValueError):
+            pass
+        try:
+            user.total_losses = int(float(json_losses))
+        except (TypeError, ValueError):
+            pass
+
+@app.before_request
+def _refresh_cache_on_request():
+    _load_users_if_stale()
+    _maybe_sync_logged_in_player_from_json()
+
 
 # ------------- Routes ---------------
+
+@app.post("/_refresh_cache")
+def _refresh_cache():
+    _load_users_if_stale()
+    return ("", 204)
+
+
 @app.route("/")
 def index():
     if session.get("user"):
@@ -82,6 +162,7 @@ def index():
 
 @app.route("/stats")
 def stats():
+    _refresh_cache_on_request()
     user = current_user()
     if not user:
         return redirect(url_for("login"))
@@ -98,6 +179,55 @@ def stats():
         net_earnings=net_earnings,
         balance_history=json.dumps(user.balance_history)
     )
+
+@app.route("/plinko", methods=["GET"])
+def plinko_page():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    # Minimal inline HTML to avoid creating a new template file
+    return f"""
+    <!doctype html>
+    <html><head><meta charset="utf-8"><title>Plinko</title></head>
+    <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin:2rem;">
+      <h1>Plinko</h1>
+      <p>Logged in as: <strong>{user.name}</strong></p>
+      <form method="post" action="{url_for('plinko_run')}">
+        <button type="submit" style="padding:.6rem 1rem; font-size:1rem;">Play Plinko</button>
+      </form>
+      <p style="margin-top:1rem; color:#666;">
+        A game window will open on the machine running this Flask app. Closing the window or pressing Q will save your balance to <code>user_data.json</code>.
+      </p>
+    </body></html>
+    """
+
+@app.route("/plinko/run", methods=["POST", "GET"])
+def plinko_run():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    env = os.environ.copy()
+    env["PLINKO_USER"] = user.name
+
+    if sys.platform.startswith("win"):
+        DETACHED = 0x00000008  # DETACHED_PROCESS
+        subprocess.Popen(
+            [sys.executable, str(PLINKO_MAIN)],
+            env=env,
+            creationflags=DETACHED,
+            close_fds=True
+        )
+    else:
+        subprocess.Popen(
+            [sys.executable, str(PLINKO_MAIN)],
+            env=env,
+            start_new_session=True,
+            close_fds=True
+        )
+
+    return ("", 204)
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -159,6 +289,7 @@ def home():
 
 @app.route("/play", methods=["GET"])
 def play():
+    _refresh_cache_on_request()
     user = current_user()
     if not user:
         return redirect(url_for("login"))

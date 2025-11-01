@@ -4,9 +4,11 @@
 {% include "navbar.html" %}
 <div class="content">
   <div class="user-info">
-        <p><strong>Balance:</strong> ${{ user.balance }}</p>
+    <p><strong>Balance:</strong> ${{ user.balance }}</p>
   </div>
+
   <div class="card-grid">
+    <!-- Blackjack -->
     <div class="card">
       <div class="card-img">
         <img src="{{ url_for('static', filename='img/blackjack.gif') }}" alt="">
@@ -17,6 +19,8 @@
         <a href="{{ url_for('play') }}" class="btn-green">Play</a>
       </div>
     </div>
+
+    <!-- Plinko -->
     <div class="card">
       <div class="card-img">
         <img src="{{ url_for('static', filename='img/plinko.gif') }}" alt="">
@@ -24,9 +28,11 @@
       <div class="card-content">
         <h3>Plinko</h3>
         <p>Experience incredible plinko gameplay on the best online casino!</p>
-        <span><strong>Coming soon!</strong></span>
+        <a href="{{ url_for('plinko_run') }}" class="btn-green">Play</a>
       </div>
     </div>
+
+    <!-- Roulette (coming soon) -->
     <div class="card">
       <div class="card-img">
         <img src="{{ url_for('static', filename='img/giphy.gif') }}" alt="">
