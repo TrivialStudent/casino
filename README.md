@@ -144,7 +144,7 @@ Make sure you have Python installed on your system:
 </a>
 
 
-### Contribution Log
+### Sprint 1 Contribution Log
 
 | Date | Alan | Loli | Angelina | Lorcan                                                                                                                                                     |
 |:----:|:-----|:-----|:---------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -155,7 +155,18 @@ Make sure you have Python installed on your system:
 | **10/16** | Navbar & responsive grid | Enhanced login & signup pages with styles | UI template improvements | Created README.md, improved sign-in/login UI, added custom flash warnings                                                                                  |
 | **Summary** | UI/UX, Pages, Cross-platform fixes | Frontend styling, Debugging | UI templates, Diagrams | Backend logic, Security, Stats, Documentation                                                                                                              |
 
+### Sprint 2 Contribution Log 
 
+| Date | Alan | Loli                                            | Angelina | Lorcan |
+|:----:|:-----|:------------------------------------------------|:---------|:-------|
+| **Role** | **Frontend Developer & UI/UX Designer** | **Documentation & Requirements Specialist**                                           | **Backend Integration & Data Specialist** | **Project Lead, Backend Architecture & Game Development** |
+| **10/27** | - | SRS updates and refinements                     | - | Pygame window & obstacle rendering, preferred name feature & player class refactor |
+| **10/28** | - | -                                               | Net value system, balance to homepage | Plinko ball physics, flash message cleanup, slot→plinko gif, PR merges |
+| **10/29** | - | -                                               | - | Preferred name glitch fix, branch merging |
+| **10/30** | - | SRS documentation                               | - | Plinko game finalized, Flask integration in progress |
+| **10/31** | Auto-login after signup | -                                               | - | Pygame window size fixes |
+| **11/1** | Blackjack UI/UX overhaul | SRS revisions                                   | - | Dynamic balance updates (JS), JSON cache fix, Plinko integration, prevent concurrent instances, README updates, merge coordination |
+| **Summary** | Blackjack redesign, UX improvements | -                                               | Net value tracking, homepage balance | Full Plinko game (Pygame), JSON fixes, preferred name system, documentation |
 ### Important Notes
 ### Plinko
 * After pressing play, a window will open in the background. You may have to move other tabs around to see it!
