@@ -42,23 +42,19 @@ def ensure_game(user: Player):
         GAMES[user.name] = {
             "deck": Deck(),
             "dealer": Dealer(),
-            "round_active": False,  # no bet yet
-            "log": []
+            "round_active": False,
         }
         g = GAMES[user.name]
         g["deck"].fill()
         g["deck"].shuffle()
     return GAMES[user.name]
 
-def log(g, *lines):
-    g["log"].extend(lines)
-
 def render_hidden_dealer(dealer: Dealer):
     if len(dealer.cards.cards) >= 2:
         vis = dealer.cards.cards[1]
         return (
             f"Dealer cards: ?, {vis}",
-            f"Dealer total value: ? + {vis.get_blackjack_value()}"
+            f"Dealer total value: ? + {vis.bj_value}"
         )
     elif len(dealer.cards.cards) == 1:
         return ("Dealer cards: ?", "Dealer total value: ?")
@@ -67,11 +63,11 @@ def render_hidden_dealer(dealer: Dealer):
 
 def render_full_dealer(dealer: Dealer):
     cards_text = ", ".join(str(c) for c in dealer.cards.cards)
-    return f"Dealer cards: [{cards_text}], total value: {dealer.cards.value()}"
+    return f"Dealer cards: [{cards_text}]"
 
 def render_player(user: Player):
     cards_text = ", ".join(str(c) for c in user.cards.cards)
-    return f"Player cards: [{cards_text}], total value: {user.cards.value()}"
+    return f"Player cards: [{cards_text}]"
 
 # ------------- Routes ---------------
 @app.route("/")
@@ -165,10 +161,14 @@ def play():
         return redirect(url_for("login"))
 
     g = ensure_game(user)
+
     return render_template(
         "game.html",
         user=user,
-        log="\n".join(g["log"]),
+        dealer_cards=g["dealer"].cards.cards,
+        player_cards=user.cards.cards,
+        player_total=user.cards.value(),
+        dealer_total=g["dealer"].cards.value(),
         round_active=g["round_active"]
     )
 
@@ -197,15 +197,10 @@ def bet():
             user.cards.add(g["deck"].draw())
             g["dealer"].cards.add(g["deck"].draw())
         g["round_active"] = True
-        g["log"].clear()
-
 
         h1, h2 = render_hidden_dealer(g["dealer"])
-        log(g,
-            f"Bet: ${amount}.",
-            h1, h2,
-            render_player(user)
-        )
+
+        flash(f"Current bet: ${amount}", "info")
     except ValueError:
         flash("Enter a valid integer bet.", "error")
 
@@ -222,18 +217,17 @@ def hit():
         return redirect(url_for("play"))
 
     user.cards.add(g["deck"].draw())
-    log(g, "Player hits.", render_player(user))
+    flash("Player hits.", "info")
 
     if user.cards.bust():
-        log(g, "Player busts! Round over.")
         # lose() assumes bet already deducted
         user.lose()
         g["round_active"] = False
         Players.save()
+        flash("Bust! Dealer wins.", "error")
     else:
         # re-log dealer hidden state
         h1, h2 = render_hidden_dealer(g["dealer"])
-        log(g, h1, h2)
 
     return redirect(url_for("play"))
 
@@ -247,30 +241,28 @@ def stand():
         flash("No active round. Place a bet.", "info")
         return redirect(url_for("play"))
 
-    log(g, "Player stands.", "Revealing dealer hand...")
+    flash("Player stands. Revealing dealer hand...", "info")
 
     # reveal dealer, then have dealer play
-    log(g, render_full_dealer(g["dealer"]))
     g["dealer"].play(g["deck"])   # dealer hits to 17+
-    log(g, "Dealer final:", render_full_dealer(g["dealer"]))
 
     # resolve
     p_val = user.cards.value()
     d_val = g["dealer"].cards.value()
 
     if user.cards.bust():
-        log(g, f"Player busts. Dealer wins. (p={p_val}, d={d_val})")
+        flash("Bust! Dealer wins.", "error")
         user.lose()
     elif g["dealer"].cards.bust() or p_val > d_val:
         old = user.balance
         user.win()
-        log(g, f"Player wins! Balance: {old} + bet*2 = {user.balance} (p={p_val}, d={d_val})")
+        flash("Player wins!", "success")
     elif p_val == d_val:
         old = user.balance
         user.tie()
-        log(g, f"Push. Balance: {old} + bet = {user.balance} (p={p_val}, d={d_val})")
+        flash("Push.", "info")
     else:
-        log(g, f"Dealer wins. (p={p_val}, d={d_val})")
+        flash("Dealer wins.", "error")
         user.lose()
 
     g["round_active"] = False

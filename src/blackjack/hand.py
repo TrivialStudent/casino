@@ -9,7 +9,7 @@ class Hand:
         self.cards.append(card)
 
     def value(self):
-        total = sum(card.get_blackjack_value() for card in self.cards)
+        total = sum(card.bj_value for card in self.cards)
         number_aces = sum(1 for card in self.cards if card.value == 1)
         while total > 21 and number_aces > 0:
             total -= 10

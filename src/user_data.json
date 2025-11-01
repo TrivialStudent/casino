@@ -37,5 +37,63 @@
         "balance_history": [
             500
         ]
+    },
+    {
+        "name": "trashbot14",
+        "pref_name": "Lorcan",
+        "password": "$2b$12$hMGpEP.e2cQVJ15AihX.E.ioNCMGGAs/xUrmxdKWC7wcnhYuPNknG",
+        "balance": 488,
+        "wins": 0,
+        "losses": 1,
+        "total_winnings": 0,
+        "total_losses": 12,
+        "balance_history": [
+            500,
+            488
+        ]
+    },
+    {
+        "name": "trashbot13",
+        "pref_name": "Lorcan",
+        "password": "$2b$12$GZHmpTD4TPD74dlfJy3Pben5jVkst/9n2z6ijh1ZWp4qAfJ3X6cGu",
+        "balance": 0,
+        "wins": 4,
+        "losses": 5,
+        "total_winnings": 1700,
+        "total_losses": 4200,
+        "balance_history": [
+            500,
+            0,
+            900,
+            800,
+            1100,
+            1000,
+            1100,
+            1400,
+            2400,
+            0
+        ]
+    },
+    {
+        "name": "fern123",
+        "pref_name": "Fernando",
+        "password": "$2b$12$3BV1pwH4ivEWSa08T6W0Vu/qyRoLIb07fXWkZ3oJ6XqaaCtwii4P.",
+        "balance": 1700,
+        "wins": 3,
+        "losses": 6,
+        "total_winnings": 2100,
+        "total_losses": 3000,
+        "balance_history": [
+            500,
+            400,
+            800,
+            1600,
+            0,
+            0,
+            0,
+            900,
+            1800,
+            1700
+        ]
     }
 ]
