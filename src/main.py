@@ -80,11 +80,11 @@ def render_hidden_dealer(dealer: Dealer):
     if len(dealer.cards.cards) >= 2:
         vis = dealer.cards.cards[1]
         return (
-            f"Dealer cards: [Hidden], {vis}",
+            f"Dealer cards: ?, {vis}",
             f"Dealer total value: ? + {vis.get_blackjack_value()}"
         )
     elif len(dealer.cards.cards) == 1:
-        return ("Dealer cards: [Hidden]", "Dealer total value: ?")
+        return ("Dealer cards: ?", "Dealer total value: ?")
     else:
         return ("Dealer has no cards yet.", "")
 
@@ -246,8 +246,9 @@ def signup():
 
         player = Player(username, pref_name, password)
         Players.add_player(player)
-        flash("Account created. Please log in.", "success")
-        return redirect(url_for("login"))
+        session["user"] = player.name
+        flash("Account created succesfully!", "success")
+        return redirect(url_for("home"))
 
     return render_template("signup.html")
 
@@ -332,7 +333,7 @@ def bet():
 
         h1, h2 = render_hidden_dealer(g["dealer"])
         log(g,
-            f"Bet: {amount}. Balance now: {user.balance}",
+            f"Bet: ${amount}.",
             h1, h2,
             render_player(user)
         )
