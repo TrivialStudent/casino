@@ -21,18 +21,19 @@ class Plinko:
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.play(-1)
 
-        self.user = (
-                next((u for u in users if u.get('name') == uname or u.get('pref_name') == uname), None)
-                or next((u for u in users if u.get('name') == 'test' or u.get('pref_name') == 'test'), None)
-                or (users[0] if users else {'name': uname, 'balance': 0.0, 'balance_history': []})
-        )
-
+        self.user = next((u for u in users if u.get('name') == uname), None) \
+                    or next((u for u in users if u.get('name') == 'test'), None) \
+                    or (users[0] if users else {'name': uname, 'balance': 0.0, 'balance_history': []})
 
         try:
             bal_dollars = float(self.user.get('balance', 0) or 0)
         except (TypeError, ValueError):
             bal_dollars = 0.0
         self.balance_cents = int(round(bal_dollars * 100))
+        self.start_balance_cents = self.balance_cents
+        self.lock_dir = (self.base_dir / ".locks")
+        self.lock_dir.mkdir(exist_ok=True)
+        self.lock_path = (self.lock_dir / f"{self.user.get('name', 'guest')}.lock")
 
         self.turns_total = max(0, self.balance_cents // 100)
         self.turns_left = self.turns_total
@@ -51,6 +52,15 @@ class Plinko:
         self.plinko_balls = pygame.sprite.Group()
         self.board = Board(self.space)
 
+        try:
+            # atomic create; fails if file exists
+            self.lock_fd = os.open(self.lock_path, os.O_CREAT | os.O_EXCL | os.O_RDWR)
+            os.write(self.lock_fd, str(os.getpid()).encode())
+        except FileExistsError:
+            # Already running for this user
+            print(f"Plinko already running for user {self.user.get('name')}.")
+            pygame.quit()
+            raise SystemExit
 
     def handle_score(self, multiplier):
         payout_cents = int(round(float(multiplier) * 100))
@@ -59,35 +69,48 @@ class Plinko:
         self.turns_left = self.balance_cents // 100
 
     def save_and_quit(self):
+
         users = json.loads(self.user_file.read_text()) if self.user_file.exists() else []
+        key = self.user.get('name') or 'guest'
 
 
-        key = self.user.get('name') or self.user.get('pref_name') or 'guest'
+        rec = next((x for x in users if x.get('name') == key), None)
+        if not rec:
+            rec = {'name': key, 'balance': 0.0, 'balance_history': [], 'total_winnings': 0.0}
+            users.append(rec)
 
 
-        bal_dollars = round(self.balance_cents / 100.0, 2)
-        winnings_dollars = round(self.session_winnings_cents / 100.0, 2)
+        file_cents = int(round(float(rec.get('balance', 0.0)) * 100))
 
-        updated = False
-        for u in users:
-            if u.get('name') == key or u.get('pref_name') == key:
-                u['balance'] = bal_dollars
-                bh = u.get('balance_history') or []
-                bh.append(bal_dollars)
-                u['balance_history'] = bh
-                u['total_winnings'] = round(float(u.get('total_winnings', 0) or 0) + winnings_dollars, 2)
-                updated = True
-                break
 
-        if not updated:
-            users.append({
-                'name': key,
-                'balance': bal_dollars,
-                'balance_history': [bal_dollars],
-                'total_winnings': winnings_dollars
-            })
+        delta_cents = int(self.balance_cents - self.start_balance_cents)
+        merged_cents = file_cents + delta_cents
+        merged_dollars = round(merged_cents / 100.0, 2)
 
-        self.user_file.write_text(json.dumps(users, indent=4))
+
+        rec['balance'] = merged_dollars
+        bh = rec.get('balance_history') or []
+        if not bh or float(bh[-1]) != merged_dollars:
+            bh.append(merged_dollars)
+        rec['balance_history'] = bh
+
+        # Aggregate session winnings
+        rec['total_winnings'] = round(
+            float(rec.get('total_winnings', 0.0)) + round(self.session_winnings_cents / 100.0, 2),
+            2
+        )
+
+        tmp = self.user_file.with_suffix(".tmp")
+        tmp.write_text(json.dumps(users, indent=4))
+        tmp.replace(self.user_file)
+
+        # Release lock, ping Flask, and exit
+        try:
+            os.close(self.lock_fd)
+            os.unlink(self.lock_path)
+        except Exception:
+            pass
+
         pygame.quit()
         try:
             import urllib.request
@@ -103,7 +126,7 @@ class Plinko:
 
     def draw_hud(self):
         lines = [
-            f"User: {self.user.get('name', '?')}",
+            f"User: {self.user.get('pref_name', '?')}",
             f"Balance: {self.cents_to_str(self.balance_cents)}   Turns left: {self.turns_left}",
             f"Winnings: {self.cents_to_str(self.session_winnings_cents)}",
             "[SPACE] drop ball   [Q] save+quit"

@@ -28,12 +28,13 @@ class Player:
     def win(self):
         self.balance += self.bet * 2
         self.total_winnings += self.bet
+        self.bet = 0
         self.record_balance()
         self.wins += 1
     def tie(self):
         self.balance += self.bet
-        self.record_balance()
         self.bet = 0
+        self.record_balance()
     def lose(self):
         self.total_losses += self.bet
         self.bet = 0

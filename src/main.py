@@ -9,6 +9,7 @@ from blackjack.player import Player, Players
 import bcrypt
 
 import os
+APP_EPOCH = os.urandom(16).hex()
 import pathlib
 import subprocess, sys
 
@@ -22,7 +23,6 @@ _USERS_CACHE = []
 _USERS_MTIME = 0.0
 
 def _load_users_if_stale():
-    """Reloads the users cache when user_data.json has changed."""
     global _USERS_CACHE, _USERS_MTIME
     try:
         mtime = USER_JSON.stat().st_mtime
@@ -33,13 +33,12 @@ def _load_users_if_stale():
         _USERS_MTIME = mtime
     return _USERS_CACHE
 
-# refresh before every request so pages always reflect latest file contents
 
 TEMPLATE_DIR = BASE_DIR / "templates"
 
 app = Flask(__name__, template_folder=str(TEMPLATE_DIR))
 
-app.secret_key = "dev-secret"  # replace in production
+app.secret_key = os.urandom(32) # replace in production
 
 app.config['SESSION_PERMANENT'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = 600 #10 minutes
@@ -100,19 +99,15 @@ def _maybe_sync_logged_in_player_from_json():
     if not user:
         return
 
+    g = GAMES.get(user.name)
+    if (g and g.get("round_active")) or user.bet > 0:
+        return
+
     users = _load_users_if_stale()
-    rec = next(
-        (u for u in users
-         if u.get('name') == user.name
-         or u.get('pref_name') == user.name
-         or u.get('name') == user.pref_name
-         or u.get('pref_name') == user.pref_name),
-        None
-    )
+    rec = next((u for u in users if u.get('name') == user.name), None)
     if rec is None:
         return
 
-    # JSON stores dollars
     try:
         user.balance = int(round(float(rec.get('balance', user.balance))))
     except (TypeError, ValueError):
@@ -265,6 +260,9 @@ def signup():
         Players.add_player(player)
         session["user"] = player.name
         flash("Account created succesfully!", "success")
+        session["user"] = player.name
+        session["epoch"] = APP_EPOCH  # <-- add this
+        session.permanent = True  # optional
         return redirect(url_for("home"))
 
     return render_template("signup.html")
@@ -285,15 +283,22 @@ def login():
         if bcrypt.checkpw(password.encode("utf-8"), player.password):
             session["user"] = player.name
             flash(f"Welcome, {player.pref_name}!", "success")
+            session["user"] = player.name
+            session["epoch"] = APP_EPOCH
+            session.permanent = True
             return redirect(url_for("home"))
         else:
             flash("Wrong password.", "error")
             return redirect(url_for("login"))
 
+
     return render_template("login.html")
 
 @app.route("/logout")
 def logout():
+    u = current_user()
+    if u:
+        GAMES.pop(u.name, None)
     session.pop("user", None)
     flash("Logged out.", "success")
     return redirect(url_for("login"))
@@ -378,6 +383,7 @@ def hit():
         user.lose()
         g["round_active"] = False
         Players.save()
+        _load_users_if_stale()
     else:
         # re-log dealer hidden state
         h1, h2 = render_hidden_dealer(g["dealer"])
@@ -423,6 +429,7 @@ def stand():
 
     g["round_active"] = False
     Players.save()
+    _load_users_if_stale()
     return redirect(url_for("play"))
 
 @app.route("/deposit", methods=["GET", "POST"])
