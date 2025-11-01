@@ -30,7 +30,27 @@
   </div>
 
   <div class="box">
-    <div class="log">{{ log }}</div>
+    <h3 class="dealer-player">Dealer</h3>
+    <div class="game-cards">
+      {% for card in dealer_cards %}
+        {% if loop.first and round_active %}
+          <div class="game-card">?</div>
+        {% else %}
+          <div class="game-card">
+            {{ card.rank_short }}{{ card.suit_symbol }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <h3 class="dealer-player">You</h3>
+    <div class="game-cards">
+      {% for card in player_cards %}
+        <div class="game-card">
+          {{ card.rank_short }}{{ card.suit_symbol }}
+        </div>
+      {% endfor %}
+    </div>
   </div>
 </div>
 

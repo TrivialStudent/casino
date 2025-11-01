@@ -156,6 +156,17 @@ Make sure you have Python installed on your system:
 | **Summary** | UI/UX, Pages, Cross-platform fixes | Frontend styling, Debugging | UI templates, Diagrams | Backend logic, Security, Stats, Documentation                                                                                                              |
 
 
+### Important Notes
+### Plinko
+* After pressing play, a window will open in the background. You may have to move other tabs around to see it!
+* After a Plinko round, balance will not be instantly updated. Please allow for a few seconds and navigate to a new page to refresh the JSON cache.
+
+### Navigation
+* To navigate home from deposit, stats, or blackjack pages, either:
+  - Click "All In Santos" in the top left, or
+  - Click the dropdown menu in the top right, then click the house icon
+
+
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-url]: https://github.com/TrivialStudent/casino/graphs/contributors

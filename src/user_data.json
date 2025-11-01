@@ -1,0 +1,18 @@
+[
+    {
+        "name": "1",
+        "pref_name": "1",
+        "password": "$2b$12$SBvC92/PiTNsAzhLEkSuauQ.Tt6qc6j7m6phG82zkqI0bS8F9mpS.",
+        "balance": 1892.4,
+        "wins": 1,
+        "losses": 0,
+        "total_winnings": 1415.4,
+        "total_losses": 0,
+        "balance_history": [
+            500,
+            500,
+            900,
+            1892.4
+        ]
+    }
+]

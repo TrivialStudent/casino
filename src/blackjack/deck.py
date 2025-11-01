@@ -7,9 +7,10 @@ class Deck(object):
         self.discarded = []
 
     def fill(self):
-        suits = ["Spades", "Hearts", "Diamonds", "Clubs"]
-        values = [1,2,3,4,5,6,7,8,9,10,11,12,13]
-        for suit in suits:
+        self.cards.clear()
+        SUITS = ["♠", "♥", "♦", "♣"]
+        values = range(1, 14)
+        for suit in SUITS:
             for value in values:
                 self.cards.append(Card(value, suit))
     def shuffle(self):
