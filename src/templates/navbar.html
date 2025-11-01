@@ -1,15 +1,60 @@
 <header>
-    <a href="{{ url_for('home') }}"><h2>All In Santos</h2></a>
-    <nav>
-      <div class="dropdown">
-        <span>Profile<i class="fa-solid fa-caret-down"></i></span>
-        <div class="dropdown-content">
-          <p>{{ user.pref_name}}</p>
-          <p>Balance: ${{user.balance}}</p>
-          <a href="{{ url_for('deposit') }}" class="menu-link">Deposit</a>
-          <a href="{{ url_for('stats') }}" class="menu-link">Statistics</a>
-          <a href="{{ url_for('logout') }}" class="logout-red">Log out</a>
+  <h2><a href="{{ url_for('home') }}">All In Santos</a></h2>
+  <nav>
+    <div class="dropdown">
+      <span>Profile<i class="fa-solid fa-caret-down"></i></span>
+
+      <div class="dropdown-content">
+        <p>{{ user.pref_name }}</p>
+        <p id="nav-balance">Balance: ${{ user.balance }}</p>
+        <a href="{{ url_for('deposit') }}" class="menu-link">Deposit</a>
+        <a href="{{ url_for('stats') }}" class="menu-link">Statistics</a>
+        <a href="{{ url_for('logout') }}" class="logout-red">Log out</a>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+          {% if request.endpoint != 'home' %}
+            <a href="{{ url_for('home') }}" class="home-link">
+              <img src="{{ url_for('static', filename='img/home.png') }}" alt="Home" style="width:30px;height:35px;">
+            </a>
+          {% else %}
+            <span class="home-text"></span>
+          {% endif %}
         </div>
       </div>
-    </nav>
+    </div>
+  </nav>
 </header>
+
+<script>
+(function () {
+  const el = document.getElementById("nav-balance");
+  if (!el) return;
+
+  const url = "{{ url_for('_user_snapshot') }}";
+
+  async function updateBalance() {
+    try {
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) return;
+      const d = await r.json();
+      if (d && d.auth && typeof d.balance !== "undefined") {
+        el.textContent = `Balance: $${d.balance}`;
+      }
+    } catch (_) {}
+  }
+
+  updateBalance();
+  setInterval(updateBalance, 2000);
+
+  const dd = document.querySelector(".dropdown");
+  if (dd) {
+    dd.addEventListener("mouseenter", updateBalance);
+    dd.addEventListener("click", updateBalance);
+  }
+
+  window.addEventListener("pageshow", (evt) => {
+    const nav = performance.getEntriesByType("navigation")[0];
+    if (evt.persisted || (nav && nav.type === "back_forward")) updateBalance();
+  });
+})();
+</script>

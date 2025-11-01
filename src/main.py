@@ -9,14 +9,36 @@ from blackjack.player import Player, Players
 import bcrypt
 
 import os
+APP_EPOCH = os.urandom(16).hex()
 import pathlib
+import subprocess, sys
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent
+PLINKO_DIR = (BASE_DIR / "plinko").resolve()     # e.g. C:\...\casino2\src\plinko
+PLINKO_MAIN = (PLINKO_DIR / "main.py").resolve()
+
+USER_JSON  = (BASE_DIR / "user_data.json").resolve()
+
+_USERS_CACHE = []
+_USERS_MTIME = 0.0
+
+def _load_users_if_stale():
+    global _USERS_CACHE, _USERS_MTIME
+    try:
+        mtime = USER_JSON.stat().st_mtime
+    except FileNotFoundError:
+        mtime = 0.0
+    if mtime != _USERS_MTIME:
+        _USERS_CACHE = json.loads(USER_JSON.read_text()) if USER_JSON.exists() else []
+        _USERS_MTIME = mtime
+    return _USERS_CACHE
+
+
 TEMPLATE_DIR = BASE_DIR / "templates"
 
 app = Flask(__name__, template_folder=str(TEMPLATE_DIR))
 
-app.secret_key = "dev-secret"  # replace in production
+app.secret_key = os.urandom(32) # replace in production
 
 app.config['SESSION_PERMANENT'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = 600 #10 minutes
@@ -67,9 +89,79 @@ def render_full_dealer(dealer: Dealer):
 
 def render_player(user: Player):
     cards_text = ", ".join(str(c) for c in user.cards.cards)
-    return f"Player cards: [{cards_text}]"
+    return f"Player cards: [{cards_text}], total value: {user.cards.value()}"
+def _maybe_sync_logged_in_player_from_json():
+    user = current_user()
+    if not user:
+        return
+
+    g = GAMES.get(user.name)
+    if (g and g.get("round_active")) or user.bet > 0:
+        return
+
+    users = _load_users_if_stale()
+    rec = next((u for u in users if u.get('name') == user.name), None)
+    if rec is None:
+        return
+
+    try:
+        user.balance = int(round(float(rec.get('balance', user.balance))))
+    except (TypeError, ValueError):
+        pass
+
+    bh = rec.get('balance_history')
+    if isinstance(bh, list):
+        user.balance_history = list(bh)
+
+    try:
+        user.total_winnings = int(round(float(rec.get('total_winnings', getattr(user, 'total_winnings', 0)))))
+    except (TypeError, ValueError):
+        pass
+    try:
+        user.total_losses = int(round(float(rec.get('total_losses', getattr(user, 'total_losses', 0)))))
+    except (TypeError, ValueError):
+        pass
+
+
+@app.before_request
+def _refresh_cache_on_request():
+    _load_users_if_stale()
+    _maybe_sync_logged_in_player_from_json()
+
+@app.context_processor
+def _inject_user():
+    return {"user": current_user()}
+
+@app.after_request
+def _no_cache(resp):
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    return resp
+
+from flask import jsonify
+@app.get("/_user_snapshot")
+def _user_snapshot():
+    u = current_user()
+    if not u:
+        return jsonify({"auth": False}), 401
+    return jsonify({
+        "auth": True,
+        "name": u.name,
+        "pref_name": u.pref_name,
+        "balance": u.balance,
+        "wins": getattr(u, "wins", 0),
+        "losses": getattr(u, "losses", 0),
+        "history_len": len(getattr(u, "balance_history", [])),
+    })
 
 # ------------- Routes ---------------
+
+@app.post("/_refresh_cache")
+def _refresh_cache():
+    _load_users_if_stale()
+    return ("", 204)
+
+
 @app.route("/")
 def index():
     if session.get("user"):
@@ -78,6 +170,7 @@ def index():
 
 @app.route("/stats")
 def stats():
+    _refresh_cache_on_request()
     user = current_user()
     if not user:
         return redirect(url_for("login"))
@@ -94,6 +187,55 @@ def stats():
         net_earnings=net_earnings,
         balance_history=json.dumps(user.balance_history)
     )
+
+@app.route("/plinko", methods=["GET"])
+def plinko_page():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    # Minimal inline HTML to avoid creating a new template file
+    return f"""
+    <!doctype html>
+    <html><head><meta charset="utf-8"><title>Plinko</title></head>
+    <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin:2rem;">
+      <h1>Plinko</h1>
+      <p>Logged in as: <strong>{user.name}</strong></p>
+      <form method="post" action="{url_for('plinko_run')}">
+        <button type="submit" style="padding:.6rem 1rem; font-size:1rem;">Play Plinko</button>
+      </form>
+      <p style="margin-top:1rem; color:#666;">
+        A game window will open on the machine running this Flask app. Closing the window or pressing Q will save your balance to <code>user_data.json</code>.
+      </p>
+    </body></html>
+    """
+
+@app.route("/plinko/run", methods=["POST", "GET"])
+def plinko_run():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    env = os.environ.copy()
+    env["PLINKO_USER"] = user.name
+
+    if sys.platform.startswith("win"):
+        DETACHED = 0x00000008  # DETACHED_PROCESS
+        subprocess.Popen(
+            [sys.executable, str(PLINKO_MAIN)],
+            env=env,
+            creationflags=DETACHED,
+            close_fds=True
+        )
+    else:
+        subprocess.Popen(
+            [sys.executable, str(PLINKO_MAIN)],
+            env=env,
+            start_new_session=True,
+            close_fds=True
+        )
+
+    return ("", 204)
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -114,6 +256,9 @@ def signup():
         Players.add_player(player)
         session["user"] = player.name
         flash("Account created succesfully!", "success")
+        session["user"] = player.name
+        session["epoch"] = APP_EPOCH  # <-- add this
+        session.permanent = True  # optional
         return redirect(url_for("home"))
 
     return render_template("signup.html")
@@ -134,15 +279,22 @@ def login():
         if bcrypt.checkpw(password.encode("utf-8"), player.password):
             session["user"] = player.name
             flash(f"Welcome, {player.pref_name}!", "success")
+            session["user"] = player.name
+            session["epoch"] = APP_EPOCH
+            session.permanent = True
             return redirect(url_for("home"))
         else:
             flash("Wrong password.", "error")
             return redirect(url_for("login"))
 
+
     return render_template("login.html")
 
 @app.route("/logout")
 def logout():
+    u = current_user()
+    if u:
+        GAMES.pop(u.name, None)
     session.pop("user", None)
     flash("Logged out.", "success")
     return redirect(url_for("login"))
@@ -156,6 +308,7 @@ def home():
 
 @app.route("/play", methods=["GET"])
 def play():
+    _refresh_cache_on_request()
     user = current_user()
     if not user:
         return redirect(url_for("login"))
@@ -223,6 +376,7 @@ def hit():
         # lose() assumes bet already deducted
         user.lose()
         g["round_active"] = False
+        _load_users_if_stale()
         Players.save()
         flash("Bust! Dealer wins.", "error")
     else:
@@ -267,6 +421,7 @@ def stand():
 
     g["round_active"] = False
     Players.save()
+    _load_users_if_stale()
     return redirect(url_for("play"))
 
 @app.route("/deposit", methods=["GET", "POST"])
