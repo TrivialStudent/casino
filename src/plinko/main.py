@@ -53,7 +53,7 @@ class Plinko:
         self.board = Board(self.space)
 
         try:
-            # atomic create; fails if file exists
+            # attempt to lock pygame instances to 1 max
             self.lock_fd = os.open(self.lock_path, os.O_CREAT | os.O_EXCL | os.O_RDWR)
             os.write(self.lock_fd, str(os.getpid()).encode())
         except FileExistsError:

@@ -134,6 +134,7 @@ Make sure you have Python installed on your system:
 - [ ] Add more games
     - [ ] Roullette
     - [ ] Slot machines
+    - [X] Plinko
 - [ ] Add Leaderboard
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
