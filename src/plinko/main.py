@@ -21,18 +21,26 @@ class Plinko:
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.play(-1)
 
-        self.user = next((u for u in users if u.get('name') == uname), None) or \
-                    next((u for u in users if u.get('name') == 'test'),
-                         users[0] if users else {'name': uname, 'balance': 0, 'balance_history': []})
+        self.user = (
+                next((u for u in users if u.get('name') == uname or u.get('pref_name') == uname), None)
+                or next((u for u in users if u.get('name') == 'test' or u.get('pref_name') == 'test'), None)
+                or (users[0] if users else {'name': uname, 'balance': 0.0, 'balance_history': []})
+        )
 
-        self.balance_cents = int(self.user.get('balance', 0))
-        self.turns_total = max(0, self.balance_cents )
+
+        try:
+            bal_dollars = float(self.user.get('balance', 0) or 0)
+        except (TypeError, ValueError):
+            bal_dollars = 0.0
+        self.balance_cents = int(round(bal_dollars * 100))
+
+        self.turns_total = max(0, self.balance_cents // 100)
         self.turns_left = self.turns_total
         self.session_winnings_cents = 0
         self.balls_in_play = 0
 
         self.font = pygame.font.SysFont(None, 30)
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Plinko")
         self.clock = pygame.time.Clock()
         self.delta_time = 0.0
@@ -45,39 +53,59 @@ class Plinko:
 
 
     def handle_score(self, multiplier):
-        payout_cents = int(round(float(multiplier)))
+        payout_cents = int(round(float(multiplier) * 100))
         self.session_winnings_cents += payout_cents
         self.balance_cents += payout_cents
-        self.turns_left = self.balance_cents
+        self.turns_left = self.balance_cents // 100
 
     def save_and_quit(self):
         users = json.loads(self.user_file.read_text()) if self.user_file.exists() else []
+
+
+        key = self.user.get('name') or self.user.get('pref_name') or 'guest'
+
+
+        bal_dollars = round(self.balance_cents / 100.0, 2)
+        winnings_dollars = round(self.session_winnings_cents / 100.0, 2)
+
+        updated = False
         for u in users:
-            if u.get('pref_name') == self.user.get('pref_name'):
-                u['balance'] = int(self.balance_cents)
+            if u.get('name') == key or u.get('pref_name') == key:
+                u['balance'] = bal_dollars
                 bh = u.get('balance_history') or []
-                bh.append(int(self.balance_cents))
+                bh.append(bal_dollars)
                 u['balance_history'] = bh
-                u['total_winnings'] = int(u.get('total_winnings', 0)) + int(self.session_winnings_cents)
+                u['total_winnings'] = round(float(u.get('total_winnings', 0) or 0) + winnings_dollars, 2)
+                updated = True
                 break
-        else:
+
+        if not updated:
             users.append({
-                'name': self.user.get('pref_name', 'guest'),
-                'balance': float(self.balance_cents),
-                'balance_history': [int(self.balance_cents)],
-                'total_winnings': int(self.session_winnings_cents)
+                'name': key,
+                'balance': bal_dollars,
+                'balance_history': [bal_dollars],
+                'total_winnings': winnings_dollars
             })
 
         self.user_file.write_text(json.dumps(users, indent=4))
         pygame.quit()
+        try:
+            import urllib.request
+            urllib.request.urlopen("http://127.0.0.1:5000/_refresh_cache", data=b"")  # POST
+        except Exception:
+            pass
         raise SystemExit
 
+    def cents_to_str(self, cents: int) -> str:
+        sign = '-' if cents < 0 else ''
+        cents = abs(int(cents))
+        return f"{sign}${cents // 100}.{cents % 100:02d}"
 
     def draw_hud(self):
         lines = [
-            f"User: {self.user.get('pref_name', '?')}",
-            f"Balance: {self.balance_cents}   Turns left: {self.turns_left}",
-            f"Winnings: {self.session_winnings_cents}",
+            f"User: {self.user.get('name', '?')}",
+            f"Balance: {self.cents_to_str(self.balance_cents)}   Turns left: {self.turns_left}",
+            f"Winnings: {self.cents_to_str(self.session_winnings_cents)}",
             "[SPACE] drop ball   [Q] save+quit"
         ]
 
@@ -100,10 +128,10 @@ class Plinko:
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     self.save_and_quit()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    if self.balance_cents >= 1:
+                    if self.balance_cents >= 100:
                         self.turns_left -= 1
-                        self.balance_cents -= 1  # $1 per ball
-                        self.turns_left = self.balance_cents
+                        self.balance_cents -= 100  # $1 per ball
+                        self.turns_left = self.balance_cents // 100
 
                         self.ball_sound.play()
                         random_x = WIDTH // 2 + random.choice([random.randint(-10, -1), random.randint(1, 10)])
