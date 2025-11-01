@@ -101,8 +101,6 @@ def _maybe_sync_logged_in_player_from_json():
         return
 
     users = _load_users_if_stale()
-
-    # find matching JSON record by name OR pref_name (both directions)
     rec = next(
         (u for u in users
          if u.get('name') == user.name
@@ -114,37 +112,56 @@ def _maybe_sync_logged_in_player_from_json():
     if rec is None:
         return
 
-    # pull fresh values from JSON
+    # JSON stores dollars
     try:
-        json_balance = int(float(rec.get('balance', user.balance)))
+        user.balance = int(round(float(rec.get('balance', user.balance))))
     except (TypeError, ValueError):
-        json_balance = user.balance
+        pass
 
-    json_hist = rec.get('balance_history') or []
-    json_wins = rec.get('total_winnings', user.total_winnings)
-    json_losses = rec.get('total_losses', user.total_losses)
+    bh = rec.get('balance_history')
+    if isinstance(bh, list):
+        user.balance_history = list(bh)
 
-    # If JSON looks newer (longer history OR different last entry), adopt it.
-    if (json_hist and (
-        len(json_hist) > len(user.balance_history)
-        or json_hist[-1] != (user.balance_history[-1] if user.balance_history else None)
-    )):
-        user.balance = json_balance
-        user.balance_history = list(json_hist)
-        try:
-            user.total_winnings = int(float(json_wins))
-        except (TypeError, ValueError):
-            pass
-        try:
-            user.total_losses = int(float(json_losses))
-        except (TypeError, ValueError):
-            pass
+    try:
+        user.total_winnings = int(round(float(rec.get('total_winnings', getattr(user, 'total_winnings', 0)))))
+    except (TypeError, ValueError):
+        pass
+    try:
+        user.total_losses = int(round(float(rec.get('total_losses', getattr(user, 'total_losses', 0)))))
+    except (TypeError, ValueError):
+        pass
+
 
 @app.before_request
 def _refresh_cache_on_request():
     _load_users_if_stale()
     _maybe_sync_logged_in_player_from_json()
 
+@app.context_processor
+def _inject_user():
+    return {"user": current_user()}
+
+@app.after_request
+def _no_cache(resp):
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    return resp
+
+from flask import jsonify
+@app.get("/_user_snapshot")
+def _user_snapshot():
+    u = current_user()
+    if not u:
+        return jsonify({"auth": False}), 401
+    return jsonify({
+        "auth": True,
+        "name": u.name,
+        "pref_name": u.pref_name,
+        "balance": u.balance,
+        "wins": getattr(u, "wins", 0),
+        "losses": getattr(u, "losses", 0),
+        "history_len": len(getattr(u, "balance_history", [])),
+    })
 
 # ------------- Routes ---------------
 
