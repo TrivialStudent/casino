@@ -44,7 +44,9 @@
 
 ## About The Project
 
-<img width="2474" height="1144" alt="image" src="https://github.com/user-attachments/assets/c561181e-ddb6-4378-9800-876b5074faf3" />
+<img width="1676" height="891" alt="image" src="https://github.com/user-attachments/assets/5c3d8015-6d73-4370-a7a2-0c72add95517" />
+
+
 
 **All In Santos** is an online casino web application built with Flask that brings classic casino games to the browser with a focus on simplicity, security, and engaging gameplay.
 
